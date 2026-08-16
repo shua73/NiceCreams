@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soft-Serve Shop — Projection Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Archivo:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --milk:#EDF1EC; --paper:#FBFCFA; --ink:#16231F; --pine:#1E4A40;
+    --aqua:#2E9C8B; --aqua-soft:#D6EDE7; --butter:#E0A93B; --cream:#F8E4BC;
+    --cherry:#C4394A; --cherry-soft:#F6DFE1; --steel:#6E7F79; --line:#D8E0D9; --ghost:#E4EAE4;
+    --display:'Bricolage Grotesque','Archivo',system-ui,sans-serif;
+    --body:'Archivo',system-ui,-apple-system,sans-serif;
+    --mono:'DM Mono','SFMono-Regular',ui-monospace,monospace;
+    --shadow:0 1px 2px rgba(22,35,31,.05), 0 8px 22px -16px rgba(22,35,31,.3);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--milk);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.4;-webkit-font-smoothing:antialiased}
+  :focus-visible{outline:2px solid var(--aqua);outline-offset:2px;border-radius:6px}
+
+  .app{height:100%;display:flex;flex-direction:column;gap:12px;padding:14px 16px 16px;max-width:1560px;margin:0 auto}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+
+  /* ---------- topbar ---------- */
+  .topbar{display:flex;align-items:center;gap:16px;flex:none}
+  .brand{display:flex;align-items:baseline;gap:12px;min-width:0}
+  .brand h1{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.025em;margin:0;white-space:nowrap}
+  .brand h1 em{font-style:normal;color:var(--aqua)}
+  .brand .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--steel);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .spacer{flex:1}
+  .badge{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;padding:8px 13px;border-radius:999px;border:1.5px solid currentColor;white-space:nowrap}
+  .badge.short{color:var(--cherry);background:var(--cherry-soft)}
+  .badge.clear{color:var(--pine);background:var(--aqua-soft)}
+  .ghostbtn{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;background:none;border:1.5px solid var(--line);color:var(--steel);padding:8px 13px;border-radius:999px;cursor:pointer}
+  .ghostbtn:hover{border-color:var(--ink);color:var(--ink)}
+
+  /* ---------- stage ---------- */
+  .stage{flex:1;min-height:0;display:grid;grid-template-columns:210px minmax(0,1fr);gap:12px}
+
+  .gauge{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 8px 14px;text-align:center;
+    background:
+      radial-gradient(circle at 18% 22%, rgba(224,169,59,.42) 1.3px, transparent 1.4px) 0 0/52px 52px,
+      radial-gradient(circle at 72% 64%, rgba(196,57,74,.34) 1.1px, transparent 1.2px) 0 0/66px 66px,
+      radial-gradient(circle at 40% 88%, rgba(46,156,139,.34) 1.1px, transparent 1.2px) 0 0/78px 78px,
+      var(--paper);}
+  .gauge svg{flex:1;min-height:0;width:100%;max-height:300px;display:block}
+  .gauge .readout{font-family:var(--display);font-weight:700;font-size:30px;letter-spacing:-.02em;line-height:1;margin-top:4px}
+  .gauge .sub{font-family:var(--mono);font-size:10.5px;color:var(--steel);margin-top:5px;line-height:1.5}
+
+  .panel{display:flex;flex-direction:column;min-width:0;min-height:0}
+  .stats{display:grid;grid-template-columns:1.45fr 1fr 1fr 1fr 1fr;border-bottom:1px solid var(--line);flex:none}
+  .stat{padding:11px 14px;border-right:1px solid var(--line);min-width:0}
+  .stat:last-child{border-right:none}
+  .stat .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--steel);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stat .v{font-family:var(--display);font-weight:700;letter-spacing:-.02em;font-size:23px;line-height:1.15;margin-top:3px;white-space:nowrap}
+  .stat.hero .v{font-size:32px}
+  .stat .f{font-family:var(--mono);font-size:10px;color:var(--steel);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pos{color:var(--pine)} .neg{color:var(--cherry)}
+
+  .viewhead{display:flex;align-items:center;gap:12px;padding:8px 14px 4px;flex:none}
+  .viewhead .note{font-family:var(--mono);font-size:10.5px;color:var(--steel)}
+  .seg{display:flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden}
+  .seg button{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;color:var(--steel);padding:5px 12px;cursor:pointer}
+  .seg button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+  .view{flex:1;min-height:0;position:relative}
+  #chart{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+  #tableview{position:absolute;inset:0;overflow:auto;padding:0 10px 10px}
+  table.grid{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px}
+  table.grid th{position:sticky;top:0;background:var(--paper);font-weight:500;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--steel);text-align:right;padding:8px 8px;border-bottom:1.5px solid var(--ink);white-space:nowrap}
+  table.grid th:first-child{text-align:left}
+  table.grid td{padding:7px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  table.grid td:first-child{text-align:left;font-family:var(--body);font-size:12.5px}
+  tr.mark-be{background:var(--aqua-soft)} tr.mark-now{background:#FFF4DC}
+  .tag{font-size:9px;letter-spacing:.09em;text-transform:uppercase;padding:2px 6px;border-radius:999px;margin-left:7px}
+  .tag.be{background:var(--pine);color:#fff} .tag.now{background:var(--butter);color:#fff}
+  .hidden{display:none!important}
+
+  /* ---------- console ---------- */
+  .console{flex:none;display:flex;align-items:stretch;gap:0;padding:10px 4px 12px;overflow-x:auto}
+  .bank{display:flex;flex-direction:column;padding:0 12px;border-right:1px solid var(--line)}
+  .bank:last-child{border-right:none}
+  .bank h2{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:500;margin:0 0 8px;color:var(--steel)}
+  .bank h2 b{color:var(--ink);font-weight:500}
+  .faders{display:flex;gap:10px;flex:1}
+
+  .fader{width:56px;display:flex;flex-direction:column;align-items:center;text-align:center}
+  .fader .val{font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--ink);height:16px;white-space:nowrap}
+  .slot{position:relative;width:38px;height:132px;margin:6px 0 5px;cursor:grab;touch-action:none;border-radius:8px}
+  .slot:active{cursor:grabbing}
+  .track{position:absolute;top:9px;bottom:9px;left:0;right:0}
+  .rail{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:5px;border-radius:3px;background:var(--ghost);box-shadow:inset 0 1px 2px rgba(22,35,31,.18)}
+  .fill{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:5px;border-radius:3px;background:var(--accent)}
+  .cap{position:absolute;left:2px;width:34px;height:15px;border-radius:5px;background:var(--paper);border:1.5px solid var(--ink);
+       box-shadow:0 2px 4px rgba(22,35,31,.22);transform:translateY(50%);display:flex;align-items:center;justify-content:center}
+  .cap::after{content:'';width:20px;height:2px;border-radius:2px;background:var(--accent)}
+  .slot:hover .cap{border-color:var(--accent)}
+  .fader .lab{font-family:var(--body);font-size:10.5px;font-weight:500;line-height:1.2;color:var(--ink);height:25px;display:flex;align-items:center;justify-content:center}
+  .fader .unit{font-family:var(--mono);font-size:9px;color:var(--steel);line-height:1.3;margin-top:1px}
+  .ticks{position:absolute;top:9px;bottom:9px;left:50%;transform:translateX(-50%);width:22px;pointer-events:none}
+  .ticks i{position:absolute;left:0;right:0;height:1px;background:var(--line)}
+
+  .chips{display:flex;gap:5px;margin-top:auto;padding-top:8px}
+  .chip{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;padding:5px 8px;border-radius:7px;border:1.5px solid var(--line);background:#fff;color:var(--steel);cursor:pointer}
+  .chip:hover{border-color:var(--steel);color:var(--ink)}
+  .chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+
+  @media (max-width:1000px), (max-height:640px){
+    html,body{height:auto}
+    .app{height:auto}
+    .stage{grid-template-columns:1fr}
+    .gauge{min-height:260px}
+    .gauge svg{max-height:200px}
+    .view{min-height:280px}
+    .stats{grid-template-columns:1fr 1fr}
+    .stat{border-bottom:1px solid var(--line)}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <h1>Soft-serve <em>console</em></h1>
+      <span class="eyebrow">Four machines · 1,000–1,200 sq ft · daily economics</span>
+    </div>
+    <span class="spacer"></span>
+    <span id="verdict" class="badge short">—</span>
+    <button id="reset" class="ghostbtn" type="button">Reset</button>
+  </header>
+
+  <main class="stage">
+
+    <section class="card gauge">
+      <svg viewBox="0 0 220 330" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="gaugeTitle">
+        <title id="gaugeTitle">Volume against break-even</title>
+        <defs>
+          <clipPath id="swirlClip">
+            <path d="M76 200 L144 200 L110 318 Z"/>
+            <ellipse cx="110" cy="196" rx="43" ry="21"/>
+            <ellipse cx="104" cy="172" rx="41" ry="20"/>
+            <ellipse cx="116" cy="150" rx="36" ry="19"/>
+            <ellipse cx="104" cy="128" rx="31" ry="17"/>
+            <ellipse cx="115" cy="108" rx="25" ry="15"/>
+            <ellipse cx="106" cy="90" rx="19" ry="13"/>
+            <ellipse cx="112" cy="75" rx="13" ry="11"/>
+            <ellipse cx="109" cy="63" rx="8" ry="9"/>
+          </clipPath>
+          <clipPath id="coneClip"><path d="M76 200 L144 200 L110 318 Z"/></clipPath>
+          <linearGradient id="creamGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FBEFD3"/><stop offset="100%" stop-color="#EFD094"/>
+          </linearGradient>
+          <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#16231F" flood-opacity=".13"/>
+          </filter>
+        </defs>
+        <g filter="url(#soft)"><g clip-path="url(#swirlClip)">
+          <rect x="0" y="0" width="220" height="330" fill="var(--ghost)"/>
+          <rect id="fillRect" x="0" y="318" width="220" height="0" fill="url(#creamGrad)"/>
+        </g></g>
+        <g clip-path="url(#coneClip)" stroke="#B99A63" stroke-opacity=".5" stroke-width="1">
+          <path d="M56 206 L172 300 M56 226 L162 312 M56 246 L150 322 M56 266 L134 330 M56 286 L118 330 M164 206 L48 300 M164 226 L58 312 M164 246 L70 322 M164 266 L86 330 M164 286 L102 330"/>
+        </g>
+        <g fill="none" stroke="#16231F" stroke-opacity=".13" stroke-width="1.4" stroke-linecap="round">
+          <path d="M72 190 Q110 208 150 188"/><path d="M66 166 Q104 184 143 164"/>
+          <path d="M82 144 Q116 161 150 142"/><path d="M75 122 Q104 138 133 120"/>
+          <path d="M92 102 Q115 116 138 100"/><path d="M89 85 Q107 96 124 83"/>
+        </g>
+        <g id="beMark">
+          <line x1="16" y1="186" x2="204" y2="186" stroke="var(--cherry)" stroke-width="1.6" stroke-dasharray="5 4"/>
+          <text id="beLabel" x="16" y="178" font-family="DM Mono, monospace" font-size="11" fill="var(--cherry)">break-even</text>
+        </g>
+        <g id="cherry" opacity="0">
+          <path d="M110 50 Q116 40 124 36" stroke="#4A7A2E" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="109" cy="53" r="9.5" fill="var(--cherry)"/>
+          <circle cx="106" cy="50" r="2.6" fill="#fff" opacity=".45"/>
+        </g>
+      </svg>
+      <div class="readout" id="volReadout">50</div>
+      <div class="sub" id="volSub">servings / day</div>
+    </section>
+
+    <section class="card panel">
+      <div class="stats">
+        <div class="stat hero">
+          <div class="k">Daily profit after recovery</div>
+          <div class="v" id="o-daily">—</div>
+          <div class="f" id="o-daily-f">—</div>
+        </div>
+        <div class="stat">
+          <div class="k">Monthly</div><div class="v" id="o-monthly">—</div><div class="f" id="o-monthly-f">—</div>
+        </div>
+        <div class="stat">
+          <div class="k">Break-even / day</div><div class="v" id="o-be">—</div><div class="f" id="o-be-f">—</div>
+        </div>
+        <div class="stat">
+          <div class="k">Contribution</div><div class="v" id="o-contrib">—</div><div class="f" id="o-contrib-f">—</div>
+        </div>
+        <div class="stat">
+          <div class="k">Cash payback</div><div class="v" id="o-payback">—</div><div class="f" id="o-payback-f">—</div>
+        </div>
+      </div>
+
+      <div class="viewhead">
+        <div class="seg" role="group" aria-label="View">
+          <button type="button" data-view="curve" aria-pressed="true">Curve</button>
+          <button type="button" data-view="table" aria-pressed="false">Table</button>
+        </div>
+        <span class="note" id="viewnote">Drag anywhere on the curve to set volume</span>
+      </div>
+
+      <div class="view">
+        <svg id="chart" role="img" aria-label="Revenue and daily cost by servings per day"></svg>
+        <div id="tableview" class="hidden">
+          <table class="grid">
+            <thead><tr><th>Servings / day</th><th>Revenue</th><th>Variable</th><th>Fixed + recovery</th><th>Total cost</th><th>Daily profit</th><th>Monthly</th><th>Margin</th></tr></thead>
+            <tbody id="scenarios"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="card console" id="console"></footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const ITEMS = [
+    {name:'Leasehold improvements / construction', lean:40000, base:75000, heavy:130000},
+    {name:'Electrical + plumbing',                 lean:10000, base:20000, heavy:35000},
+    {name:'Four soft-serve machines',              lean:32000, base:32000, heavy:32000},
+    {name:'Refrigeration / freezer / misc.',       lean:8000,  base:12000, heavy:20000},
+    {name:'Counters, sinks, shelving, prep',       lean:8000,  base:12000, heavy:20000},
+    {name:'Furniture, signage, décor',             lean:8000,  base:15000, heavy:25000},
+    {name:'POS, smallwares, opening inventory',    lean:5000,  base:8000,  heavy:12000},
+    {name:'Architecture, permits, fees',           lean:5000,  base:10000, heavy:20000},
+    {name:'Contingency',                           lean:8000,  base:15000, heavy:25000}
+  ];
+  const PRESET_TOTAL = {
+    lean: ITEMS.reduce((a,i)=>a+i.lean,0),
+    base: ITEMS.reduce((a,i)=>a+i.base,0),
+    heavy: ITEMS.reduce((a,i)=>a+i.heavy,0)
+  };
+
+  const DEFAULTS = {
+    price:7, materials:2, cardFee:0.03, servings:50, openHours:10,
+    loadedWage:20.5, laborHours:16,
+    rent:6000, utilities:1500, other:2000, opDays:30,
+    startup:PRESET_TOTAL.base, recoveryYears:5
+  };
+  const state = Object.assign({}, DEFAULTS);
+
+  const MINUS='\u2212';
+  const nf=(n,d)=>Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+  const usd=(n,d=0)=>(n<-0.004?MINUS:'')+'$'+nf(n,d);
+  const usdk=n=>(n<0?MINUS:'')+'$'+nf(Math.abs(n)/1000,0)+'k';
+  const num=(n,d=0)=>(n<0?MINUS:'')+nf(n,d);
+  const pct=(n,d=1)=>(n<0?MINUS:'')+nf(n*100,d)+'%';
+
+  function compute(){
+    const s=state;
+    const varCost=s.materials+s.price*s.cardFee;
+    const contribution=s.price-varCost;
+    const dailyLabor=s.loadedWage*s.laborHours;
+    const opDays=Math.max(s.opDays,1);
+    const opFixedDay=dailyLabor+(s.rent+s.utilities+s.other)/opDays;
+    const recoveryDay=s.startup/(Math.max(s.recoveryYears,.25)*12*opDays);
+    const totalFixedDay=opFixedDay+recoveryDay;
+    const viable=contribution>0;
+    const beCash=viable?Math.ceil(opFixedDay/contribution):Infinity;
+    const beFull=viable?Math.ceil(totalFixedDay/contribution):Infinity;
+    const revenue=s.servings*s.price, variable=s.servings*varCost;
+    const totalCost=variable+totalFixedDay;
+    const daily=revenue-totalCost, monthly=daily*opDays;
+    const cashDaily=revenue-variable-opFixedDay;
+    const payback=cashDaily>0?s.startup/(cashDaily*opDays):Infinity;
+    const margin=revenue>0?daily/revenue:0;
+    return {varCost,contribution,dailyLabor,opDays,opFixedDay,recoveryDay,totalFixedDay,viable,
+            beCash,beFull,revenue,variable,totalCost,daily,monthly,cashDaily,payback,margin};
+  }
+
+  /* ---------------- fader console ---------------- */
+  const BANKS = [
+    {title:'Product', accent:'var(--aqua)', faders:[
+      {k:'price',     lab:'Price',      unit:'/ serving', min:1, max:16, step:.25, fmt:v=>usd(v,2)},
+      {k:'materials', lab:'Mix + cup',  unit:'/ serving', min:0, max:8,  step:.05, fmt:v=>usd(v,2)},
+      {k:'cardFee',   lab:'Card fee',   unit:'of price',  min:0, max:.06,step:.001,fmt:v=>pct(v,1)}
+    ]},
+    {title:'Volume', accent:'var(--butter)', faders:[
+      {k:'servings',  lab:'Servings',   unit:'/ day',     min:0, max:600, step:5, fmt:v=>num(v)},
+      {k:'openHours', lab:'Open hours', unit:'/ day',     min:4, max:16,  step:.5,fmt:v=>num(v,1)+'h'}
+    ]},
+    {title:'Labor', accent:'var(--pine)', faders:[
+      {k:'loadedWage',lab:'Loaded wage',unit:'/ hour',    min:10,max:44,  step:.25,fmt:v=>usd(v,2)},
+      {k:'laborHours',lab:'Staffed',    unit:'hrs / day', min:0, max:60,  step:.5, fmt:v=>num(v,1)}
+    ]},
+    {title:'Overhead', accent:'var(--steel)', faders:[
+      {k:'rent',      lab:'Rent + CAM', unit:'/ month',   min:0, max:20000,step:100,fmt:v=>usdk(v)},
+      {k:'utilities', lab:'Utilities',  unit:'/ month',   min:0, max:6000, step:50, fmt:v=>usd(v)},
+      {k:'other',     lab:'Other',      unit:'/ month',   min:0, max:12000,step:100,fmt:v=>usd(v)},
+      {k:'opDays',    lab:'Open days',  unit:'/ month',   min:15,max:31,   step:1,  fmt:v=>num(v)}
+    ]},
+    {title:'Build-out', accent:'var(--cherry)', faders:[
+      {k:'startup',       lab:'Investment', unit:'total',  min:80000, max:400000, step:1000, fmt:v=>usdk(v)},
+      {k:'recoveryYears', lab:'Recover in', unit:'years',  min:1,     max:15,     step:.5,   fmt:v=>num(v,1)}
+    ]}
+  ];
+
+  const faders = {};
+
+  function buildConsole(){
+    const host = document.getElementById('console');
+    BANKS.forEach(bank=>{
+      const el = document.createElement('div');
+      el.className = 'bank';
+      el.style.setProperty('--accent', bank.accent);
+      el.innerHTML = '<h2><b>'+bank.title+'</b></h2><div class="faders"></div>';
+      const row = el.querySelector('.faders');
+
+      bank.faders.forEach(cfg=>{
+        const f = document.createElement('div');
+        f.className = 'fader';
+        f.innerHTML =
+          '<div class="val" id="fv-'+cfg.k+'"></div>' +
+          '<div class="slot" tabindex="0" role="slider" id="fs-'+cfg.k+'" ' +
+              'aria-label="'+cfg.lab+' '+cfg.unit+'" aria-valuemin="'+cfg.min+'" aria-valuemax="'+cfg.max+'" aria-orientation="vertical">' +
+            '<div class="track">' +
+              '<div class="rail"></div>' +
+              '<div class="ticks"><i style="top:0"></i><i style="top:25%"></i><i style="top:50%"></i><i style="top:75%"></i><i style="bottom:0"></i></div>' +
+              '<div class="fill" id="ff-'+cfg.k+'"></div>' +
+              '<div class="cap" id="fc-'+cfg.k+'"></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="lab">'+cfg.lab+'</div><div class="unit">'+cfg.unit+'</div>';
+        row.appendChild(f);
+
+        const slot = f.querySelector('.slot');
+        const track = f.querySelector('.track');
+        faders[cfg.k] = {cfg, slot, track, fill:f.querySelector('.fill'), cap:f.querySelector('.cap'), val:f.querySelector('.val')};
+
+        const setFromY = clientY => {
+          const r = track.getBoundingClientRect();
+          const frac = 1 - (clientY - r.top) / r.height;
+          setValue(cfg.k, cfg.min + Math.max(0, Math.min(1, frac)) * (cfg.max - cfg.min));
+        };
+        let dragging = false;
+        slot.addEventListener('pointerdown', e=>{ dragging=true; slot.setPointerCapture(e.pointerId); setFromY(e.clientY); e.preventDefault(); });
+        slot.addEventListener('pointermove', e=>{ if(dragging) setFromY(e.clientY); });
+        slot.addEventListener('pointerup', ()=>{dragging=false;});
+        slot.addEventListener('pointercancel', ()=>{dragging=false;});
+        slot.addEventListener('keydown', e=>{
+          const big = (cfg.max-cfg.min)/10;
+          let v = state[cfg.k], hit = true;
+          switch(e.key){
+            case 'ArrowUp': case 'ArrowRight': v += cfg.step; break;
+            case 'ArrowDown': case 'ArrowLeft': v -= cfg.step; break;
+            case 'PageUp':   v += big; break;
+            case 'PageDown': v -= big; break;
+            case 'Home':     v = cfg.min; break;
+            case 'End':      v = cfg.max; break;
+            default: hit = false;
+          }
+          if(hit){ e.preventDefault(); setValue(cfg.k, v); }
+        });
+      });
+      host.appendChild(el);
+    });
+
+    // build-out presets
+    const bank = host.lastElementChild;
+    const chips = document.createElement('div');
+    chips.className = 'chips';
+    chips.innerHTML = ['lean','base','heavy'].map(p=>
+      '<button class="chip" type="button" data-preset="'+p+'" aria-pressed="'+(p==='base')+'">'+p+'</button>').join('');
+    bank.appendChild(chips);
+    chips.querySelectorAll('.chip').forEach(ch=>{
+      ch.addEventListener('click', ()=>{ setValue('startup', PRESET_TOTAL[ch.dataset.preset]); });
+    });
+  }
+
+  function snap(v, cfg){
+    const stepped = Math.round((v - cfg.min) / cfg.step) * cfg.step + cfg.min;
+    const clamped = Math.min(Math.max(stepped, cfg.min), cfg.max);
+    const d = (String(cfg.step).split('.')[1]||'').length;
+    return Number(clamped.toFixed(d));
+  }
+  function setValue(k, v){
+    const cfg = faders[k].cfg;
+    state[k] = snap(v, cfg);
+    render();
+  }
+  function paintFaders(){
+    Object.keys(faders).forEach(k=>{
+      const {cfg, fill, cap, val, slot} = faders[k];
+      const p = (state[k] - cfg.min) / (cfg.max - cfg.min);
+      fill.style.height = (p*100)+'%';
+      cap.style.bottom = (p*100)+'%';
+      val.textContent = cfg.fmt(state[k]);
+      slot.setAttribute('aria-valuenow', state[k]);
+      slot.setAttribute('aria-valuetext', cfg.fmt(state[k]));
+    });
+    document.querySelectorAll('.chip').forEach(ch=>{
+      ch.setAttribute('aria-pressed', String(PRESET_TOTAL[ch.dataset.preset] === state.startup));
+    });
+  }
+
+  /* ---------------- chart ---------------- */
+  const chart = document.getElementById('chart');
+  let CW = 700, CH = 260;
+  const PAD = {t:16, r:14, b:30, l:62};
+
+  function drawChart(m){
+    if (chart.classList.contains('hidden')) return;
+    const xMax = Math.max(400, Math.ceil((state.servings*1.25)/50)*50,
+                          isFinite(m.beFull) ? Math.ceil((m.beFull*1.8)/50)*50 : 400);
+    const yMax = (Math.max(xMax*state.price, m.totalFixedDay + xMax*m.varCost) * 1.06) || 1;
+    const X = v => PAD.l + (v/xMax)*(CW-PAD.l-PAD.r);
+    const Y = v => CH - PAD.b - (v/yMax)*(CH-PAD.t-PAD.b);
+    const rev = v => v*state.price;
+    const cost = v => m.totalFixedDay + v*m.varCost;
+    const opcost = v => m.opFixedDay + v*m.varCost;
+    const MONO = 'DM Mono, monospace';
+    let g='';
+
+    for (let i=0;i<=4;i++){
+      const val=yMax*i/4, y=Y(val);
+      g += '<line x1="'+PAD.l+'" y1="'+y+'" x2="'+(CW-PAD.r)+'" y2="'+y+'" stroke="var(--line)"/>';
+      g += '<text x="'+(PAD.l-8)+'" y="'+(y+4)+'" text-anchor="end" font-family="'+MONO+'" font-size="10" fill="var(--steel)">$'+Math.round(val).toLocaleString()+'</text>';
+    }
+    for (let i=0;i<4;i++){
+      const v=xMax*i/4;
+      g += '<text x="'+X(v)+'" y="'+(CH-10)+'" text-anchor="middle" font-family="'+MONO+'" font-size="10" fill="var(--steel)">'+Math.round(v)+'</text>';
+    }
+    g += '<text x="'+(CW-PAD.r)+'" y="'+(CH-10)+'" text-anchor="end" font-family="'+MONO+'" font-size="9" fill="var(--steel)" letter-spacing="1">SERVINGS / DAY</text>';
+
+    const bx = isFinite(m.beFull) ? Math.min(m.beFull, xMax) : xMax;
+    g += '<polygon points="'+X(0)+','+Y(rev(0))+' '+X(bx)+','+Y(rev(bx))+' '+X(bx)+','+Y(cost(bx))+' '+X(0)+','+Y(cost(0))+'" fill="var(--cherry)" opacity=".08"/>';
+    if (isFinite(m.beFull) && m.beFull < xMax){
+      g += '<polygon points="'+X(bx)+','+Y(rev(bx))+' '+X(xMax)+','+Y(rev(xMax))+' '+X(xMax)+','+Y(cost(xMax))+' '+X(bx)+','+Y(cost(bx))+'" fill="var(--aqua)" opacity=".14"/>';
+    }
+    g += '<line x1="'+X(0)+'" y1="'+Y(opcost(0))+'" x2="'+X(xMax)+'" y2="'+Y(opcost(xMax))+'" stroke="var(--steel)" stroke-width="1.5" stroke-dasharray="2 4"/>';
+    g += '<line x1="'+X(0)+'" y1="'+Y(cost(0))+'" x2="'+X(xMax)+'" y2="'+Y(cost(xMax))+'" stroke="var(--ink)" stroke-width="2" stroke-dasharray="7 5"/>';
+    g += '<line x1="'+X(0)+'" y1="'+Y(rev(0))+'" x2="'+X(xMax)+'" y2="'+Y(rev(xMax))+'" stroke="var(--aqua)" stroke-width="2.6"/>';
+
+    if (isFinite(m.beFull) && m.beFull <= xMax){
+      const x=X(m.beFull), y=Y(rev(m.beFull));
+      g += '<line x1="'+x+'" y1="'+y+'" x2="'+x+'" y2="'+(CH-PAD.b)+'" stroke="var(--cherry)" stroke-width="1.2" stroke-dasharray="3 3"/>';
+      g += '<circle cx="'+x+'" cy="'+y+'" r="5" fill="var(--paper)" stroke="var(--cherry)" stroke-width="2.4"/>';
+      g += '<text x="'+(x+8)+'" y="'+(y-8)+'" font-family="'+MONO+'" font-size="10.5" fill="var(--cherry)">break-even '+m.beFull+'</text>';
+    }
+    const cx = X(Math.min(state.servings, xMax));
+    g += '<line x1="'+cx+'" y1="'+PAD.t+'" x2="'+cx+'" y2="'+(CH-PAD.b)+'" stroke="var(--ink)" stroke-width="1.4" opacity=".5"/>';
+    g += '<circle cx="'+cx+'" cy="'+Y(cost(state.servings))+'" r="5" fill="var(--ink)" stroke="var(--paper)" stroke-width="2"/>';
+    g += '<circle cx="'+cx+'" cy="'+Y(rev(state.servings))+'" r="5" fill="var(--aqua)" stroke="var(--paper)" stroke-width="2"/>';
+    const lx = Math.min(cx+7, CW-PAD.r-88);
+    g += '<rect x="'+lx+'" y="'+PAD.t+'" width="86" height="20" rx="6" fill="var(--ink)"/>';
+    g += '<text x="'+(lx+43)+'" y="'+(PAD.t+14)+'" text-anchor="middle" font-family="'+MONO+'" font-size="10.5" fill="#fff">'+Math.round(state.servings)+' / day</text>';
+
+    chart.setAttribute('viewBox','0 0 '+CW+' '+CH);
+    chart.innerHTML = g;
+    chart._xMax = xMax;
+  }
+
+  let dragChart=false;
+  function chartSet(e){
+    const r = chart.getBoundingClientRect();
+    const px = ((e.clientX-r.left)/r.width)*CW;
+    const frac = (px-PAD.l)/(CW-PAD.l-PAD.r);
+    const v = Math.max(0,Math.min(1,frac))*(chart._xMax||400);
+    setValue('servings', v);
+  }
+  chart.addEventListener('pointerdown', e=>{dragChart=true; chart.setPointerCapture(e.pointerId); chartSet(e);});
+  chart.addEventListener('pointermove', e=>{ if(dragChart) chartSet(e); });
+  chart.addEventListener('pointerup', ()=>{dragChart=false;});
+  chart.addEventListener('pointercancel', ()=>{dragChart=false;});
+
+  const view = document.querySelector('.view');
+  if (window.ResizeObserver){
+    new ResizeObserver(entries=>{
+      const r = entries[0].contentRect;
+      CW = Math.max(320, Math.round(r.width));
+      CH = Math.max(180, Math.round(r.height));
+      drawChart(compute());
+    }).observe(view);
+  }
+
+  document.querySelectorAll('.seg button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const curve = b.dataset.view === 'curve';
+      document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed', String(x===b)));
+      chart.classList.toggle('hidden', !curve);
+      document.getElementById('tableview').classList.toggle('hidden', curve);
+      document.getElementById('viewnote').textContent = curve
+        ? 'Drag anywhere on the curve to set volume'
+        : 'Daily figures at each volume, recomputed live';
+      render();
+    });
+  });
+
+  document.getElementById('reset').addEventListener('click', ()=>{ Object.assign(state, DEFAULTS); render(); });
+
+  /* ---------------- render ---------------- */
+  const $ = id => document.getElementById(id);
+
+  function render(){
+    const m = compute();
+    paintFaders();
+
+    const vb = $('verdict');
+    if (!m.viable){ vb.className='badge short'; vb.textContent='Price below unit cost'; }
+    else if (m.daily >= 0){ vb.className='badge clear'; vb.textContent='Clears by '+usd(m.daily)+' / day'; }
+    else { vb.className='badge short'; vb.textContent='Short by '+usd(Math.abs(m.daily))+' / day'; }
+
+    $('o-daily').textContent = usd(m.daily);
+    $('o-daily').className = 'v '+(m.daily>=0?'pos':'neg');
+    $('o-daily-f').textContent = usd(m.revenue)+' in · '+usd(m.totalCost)+' out · '+pct(m.margin,1);
+
+    $('o-monthly').textContent = usd(m.monthly);
+    $('o-monthly').className = 'v '+(m.monthly>=0?'pos':'neg');
+    $('o-monthly-f').textContent = 'cash '+usd(m.cashDaily*m.opDays)+' / mo';
+
+    $('o-be').textContent = m.viable ? num(m.beFull) : '—';
+    $('o-be-f').textContent = m.viable
+      ? num(m.beCash)+' cash · '+nf(m.beFull/Math.max(state.openHours,.5),1)+' / hr'
+      : 'raise above '+usd(m.varCost,2);
+
+    $('o-contrib').textContent = usd(m.contribution,2);
+    $('o-contrib').className = 'v '+(m.contribution>0?'pos':'neg');
+    $('o-contrib-f').textContent = usd(m.varCost,2)+' variable / serving';
+
+    $('o-payback').textContent = isFinite(m.payback) ? nf(m.payback,1)+' mo' : 'never';
+    $('o-payback').className = 'v '+(isFinite(m.payback)?'pos':'neg');
+    $('o-payback-f').textContent = isFinite(m.payback)
+      ? usd(state.startup)+' at '+usd(m.recoveryDay)+' / day'
+      : 'no cash surplus yet';
+
+    const yB=318, yT=50;
+    const span = m.viable ? m.beFull*2 : Math.max(state.servings,1)*2;
+    const p = Math.max(0, Math.min(1, state.servings/(span||1)));
+    const fy = yB - p*(yB-yT);
+    $('fillRect').setAttribute('y', fy);
+    $('fillRect').setAttribute('height', yB-fy);
+    $('beMark').setAttribute('transform','translate(0,'+((yB-0.5*(yB-yT))-186)+')');
+    $('beLabel').textContent = m.viable ? 'break-even '+m.beFull : 'no break-even';
+    $('cherry').setAttribute('opacity', m.daily>0 ? '1':'0');
+    $('volReadout').textContent = num(state.servings);
+    $('volSub').innerHTML = m.viable
+      ? 'servings / day<br>'+(state.servings>=m.beFull
+          ? '<span class="pos">'+num(state.servings-m.beFull)+' above the line</span>'
+          : '<span class="neg">'+num(m.beFull-state.servings)+' short of the line</span>')
+      : 'servings / day';
+
+    drawChart(m);
+
+    if (!document.getElementById('tableview').classList.contains('hidden')){
+      const set = new Set([40,100,150,200,300,400]);
+      if (m.viable) set.add(m.beFull);
+      set.add(Math.round(state.servings));
+      const tb = $('scenarios');
+      tb.innerHTML = Array.from(set).filter(v=>v>=0).sort((a,b)=>a-b).map(v=>{
+        const revenue=v*state.price, variable=v*m.varCost, total=variable+m.totalFixedDay;
+        const daily=revenue-total, monthly=daily*m.opDays, margin=revenue>0?daily/revenue:0;
+        const isNow = v===Math.round(state.servings), isBe = m.viable && v===m.beFull;
+        const tag = isNow?'<span class="tag now">now</span>':(isBe?'<span class="tag be">break-even</span>':'');
+        return '<tr class="'+(isNow?'mark-now':(isBe?'mark-be':''))+'"><td>'+num(v)+tag+'</td><td>'+usd(revenue)+'</td><td>'+usd(variable)+
+               '</td><td>'+usd(m.totalFixedDay)+'</td><td>'+usd(total)+'</td><td class="'+(daily>=0?'pos':'neg')+'">'+usd(daily)+
+               '</td><td class="'+(monthly>=0?'pos':'neg')+'">'+usd(monthly)+'</td><td>'+pct(margin,1)+'</td></tr>';
+      }).join('');
+    }
+  }
+
+  buildConsole();
+  render();
+  requestAnimationFrame(()=>{ const r=view.getBoundingClientRect(); CW=Math.max(320,Math.round(r.width)); CH=Math.max(180,Math.round(r.height)); render(); });
+})();
+</script>
+</body>
+</html>
