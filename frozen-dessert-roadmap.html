@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frozen Dessert Commercialization Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Archivo:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --milk:#EDF1EC; --paper:#FBFCFA; --ink:#16231F; --pine:#1E4A40;
+    --aqua:#2E9C8B; --aqua-soft:#D6EDE7; --butter:#E0A93B; --butter-soft:#FBF0DA;
+    --cherry:#C4394A; --cherry-soft:#F6DFE1; --steel:#6E7F79; --line:#D8E0D9; --ghost:#E4EAE4;
+    --display:'Bricolage Grotesque','Archivo',system-ui,sans-serif;
+    --body:'Archivo',system-ui,-apple-system,sans-serif;
+    --mono:'DM Mono','SFMono-Regular',ui-monospace,monospace;
+    --shadow:0 1px 2px rgba(22,35,31,.05), 0 8px 22px -16px rgba(22,35,31,.3);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--milk);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  :focus-visible{outline:2px solid var(--aqua);outline-offset:2px;border-radius:6px}
+  .shell{max-width:1120px;margin:0 auto;padding:26px 20px 90px}
+
+  /* ---------- masthead ---------- */
+  .masthead{display:flex;gap:22px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+    border-bottom:1.5px solid var(--ink);padding-bottom:20px}
+  .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--steel)}
+  h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,4.2vw,44px);line-height:.98;letter-spacing:-.028em;margin:8px 0 10px}
+  h1 em{font-style:normal;color:var(--aqua)}
+  .subtitle{color:var(--steel);font-size:14.5px;max-width:56ch}
+  .meter{display:flex;align-items:center;gap:14px;flex:none}
+  .meter svg{width:96px;height:150px;display:block}
+  .meter .figs{text-align:right}
+  .meter .pctv{font-family:var(--display);font-weight:800;font-size:40px;letter-spacing:-.03em;line-height:1}
+  .meter .cnt{font-family:var(--mono);font-size:11px;color:var(--steel);margin-top:6px;white-space:nowrap}
+  .meter .cnt b{color:var(--ink);font-weight:500}
+
+  /* ---------- toolbar ---------- */
+  .toolbar{position:sticky;top:0;z-index:20;display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+    background:rgba(237,241,236,.93);backdrop-filter:blur(8px);
+    margin:0 -20px;padding:12px 20px;border-bottom:1px solid var(--line)}
+  .seg{display:flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden;background:var(--paper)}
+  .seg button{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    background:none;border:none;color:var(--steel);padding:7px 13px;cursor:pointer;white-space:nowrap}
+  .seg button:hover{color:var(--ink)}
+  .seg button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+  .search{flex:1;min-width:170px;position:relative}
+  .search input{width:100%;font-family:var(--body);font-size:13.5px;padding:8px 12px 8px 32px;
+    border:1.5px solid var(--line);border-radius:999px;background:var(--paper);color:var(--ink)}
+  .search input:focus{outline:none;border-color:var(--aqua)}
+  .search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--steel)}
+  .ghostbtn{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;background:var(--paper);
+    border:1.5px solid var(--line);color:var(--steel);padding:7px 13px;border-radius:999px;cursor:pointer;white-space:nowrap}
+  .ghostbtn:hover{border-color:var(--ink);color:var(--ink)}
+
+  /* ---------- phase ---------- */
+  .phase{margin-top:34px}
+  .phase-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .phase-n{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--steel)}
+  .phase h2{font-family:var(--display);font-weight:700;font-size:24px;letter-spacing:-.022em}
+  .badge{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:5px 11px;border-radius:999px;border:1.5px solid currentColor}
+  .phase[data-accent=butter] .badge{color:#9A6D14;background:var(--butter-soft)}
+  .phase[data-accent=aqua] .badge{color:var(--pine);background:var(--aqua-soft)}
+  .phase-bar{flex:1;min-width:120px;height:5px;border-radius:3px;background:var(--ghost);overflow:hidden}
+  .phase-bar i{display:block;height:100%;border-radius:3px;background:var(--accent);transition:width .28s ease}
+  .phase-count{font-family:var(--mono);font-size:11px;color:var(--steel);white-space:nowrap}
+  .phase[data-accent=butter]{--accent:var(--butter)}
+  .phase[data-accent=aqua]{--accent:var(--aqua)}
+
+  /* ---------- item card ---------- */
+  .items{display:flex;flex-direction:column;gap:10px}
+  .item{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;transition:border-color .2s}
+  .item.done{border-color:var(--aqua)}
+  .item.hide{display:none}
+  .head{display:flex;align-items:center;gap:13px;padding:14px 16px;cursor:pointer;user-select:none;width:100%;background:none;border:none;text-align:left;font:inherit;color:inherit}
+  .head:hover{background:rgba(22,35,31,.02)}
+  .chip{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
+    font-family:var(--mono);font-size:13px;color:#fff;background:var(--accent)}
+  .item.done .chip{background:var(--pine)}
+  .item.done .chip::after{content:'\2713';font-size:15px}
+  .item.done .chip span{display:none}
+  .htitle{flex:1;min-width:0;font-family:var(--display);font-weight:700;font-size:16.5px;letter-spacing:-.012em;line-height:1.25}
+  .item.done .htitle{color:var(--steel);text-decoration:line-through;text-decoration-thickness:1.5px;text-decoration-color:var(--line)}
+  .dots{display:flex;gap:4px;flex:none}
+  .dots i{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--line);background:var(--paper)}
+  .dots i.on{background:var(--aqua);border-color:var(--aqua)}
+  .steps{font-family:var(--mono);font-size:10.5px;color:var(--steel);flex:none;white-space:nowrap}
+  .chev{flex:none;width:16px;height:16px;color:var(--steel);transition:transform .22s ease}
+  .item.open .chev{transform:rotate(180deg)}
+
+  .body{display:none;padding:2px 16px 18px;border-top:1px solid var(--line)}
+  .item.open .body{display:block}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  @media (max-width:720px){.grid{grid-template-columns:1fr}}
+  .block{padding:13px 15px;border-radius:11px;background:#fff;border:1px solid var(--line);border-left:3px solid var(--steel);font-size:14px}
+  .block .bt{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--steel);margin-bottom:6px}
+  .block.outcome{border-left-color:var(--aqua);background:linear-gradient(90deg,var(--aqua-soft),#fff 62%)}
+  .block.pitfall{border-left-color:var(--cherry);background:linear-gradient(90deg,var(--cherry-soft),#fff 62%);grid-column:1/-1}
+  .block.action{grid-column:1/-1;border-left-color:var(--butter);background:linear-gradient(90deg,var(--butter-soft),#fff 62%)}
+
+  .tasks{list-style:none;display:flex;flex-direction:column;gap:7px;margin-top:4px}
+  .task{display:flex;gap:11px;align-items:flex-start;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,.72);
+    border:1px solid var(--line);cursor:pointer;transition:background .15s}
+  .task:hover{background:#fff;border-color:var(--steel)}
+  .box{flex:none;width:19px;height:19px;margin-top:1px;border-radius:6px;border:1.8px solid var(--steel);background:#fff;
+    display:grid;place-items:center;transition:all .16s}
+  .task.on .box{background:var(--pine);border-color:var(--pine)}
+  .box svg{width:12px;height:12px;color:#fff;opacity:0;transition:opacity .16s}
+  .task.on .box svg{opacity:1}
+  .task .txt{font-size:13.8px;line-height:1.5}
+  .task.on .txt{color:var(--steel)}
+  .task strong{font-weight:600}
+  .task.on strong{text-decoration:line-through;text-decoration-color:var(--line)}
+
+  .contact{margin-top:12px;padding:12px 14px;border-radius:11px;background:var(--ink);color:#EAF0EC;font-family:var(--mono);font-size:12px;line-height:1.85}
+  .contact strong{color:var(--butter);font-weight:500;letter-spacing:.04em}
+  .contact a{color:var(--aqua-soft);text-decoration:underline;text-underline-offset:3px}
+  .contact a:hover{color:#fff}
+  .rowend{display:flex;justify-content:flex-end;margin-top:12px}
+  .markbtn{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+    border:1.5px solid var(--line);background:#fff;color:var(--steel);padding:7px 13px;border-radius:999px;cursor:pointer}
+  .markbtn:hover{border-color:var(--pine);color:var(--pine)}
+  .item.done .markbtn{background:var(--pine);border-color:var(--pine);color:#fff}
+
+  .empty{padding:40px 10px;text-align:center;font-family:var(--mono);font-size:12.5px;color:var(--steel)}
+  .hidden{display:none!important}
+
+  @media print{
+    .toolbar,.meter,.chev,.markbtn{display:none!important}
+    body{background:#fff}
+    .item .body{display:block!important}
+    .item{break-inside:avoid;box-shadow:none}
+    .shell{padding:0}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">Execution roadmap &middot; Kent County, Michigan</div>
+      <h1>Frozen dessert <em>roadmap</em></h1>
+      <p class="subtitle">Operational, legal, and growth execution plan from market validation to permanent retail storefront.</p>
+    </div>
+    <div class="meter">
+      <svg viewBox="0 0 220 330" role="img" aria-label="Overall progress">
+        <defs>
+          <clipPath id="swirlClip">
+            <path d="M76 200 L144 200 L110 318 Z"/>
+            <ellipse cx="110" cy="196" rx="43" ry="21"/><ellipse cx="104" cy="172" rx="41" ry="20"/>
+            <ellipse cx="116" cy="150" rx="36" ry="19"/><ellipse cx="104" cy="128" rx="31" ry="17"/>
+            <ellipse cx="115" cy="108" rx="25" ry="15"/><ellipse cx="106" cy="90" rx="19" ry="13"/>
+            <ellipse cx="112" cy="75" rx="13" ry="11"/><ellipse cx="109" cy="63" rx="8" ry="9"/>
+          </clipPath>
+          <clipPath id="coneClip"><path d="M76 200 L144 200 L110 318 Z"/></clipPath>
+          <linearGradient id="creamGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FBEFD3"/><stop offset="100%" stop-color="#EFD094"/>
+          </linearGradient>
+          <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#16231F" flood-opacity=".13"/>
+          </filter>
+        </defs>
+        <g filter="url(#soft)"><g clip-path="url(#swirlClip)">
+          <rect x="0" y="0" width="220" height="330" fill="var(--ghost)"/>
+          <rect id="fillRect" x="0" y="318" width="220" height="0" fill="url(#creamGrad)"/>
+        </g></g>
+        <g clip-path="url(#coneClip)" stroke="#B99A63" stroke-opacity=".5" stroke-width="1">
+          <path d="M56 206 L172 300 M56 226 L162 312 M56 246 L150 322 M56 266 L134 330 M164 206 L48 300 M164 226 L58 312 M164 246 L70 322 M164 266 L86 330"/>
+        </g>
+        <g fill="none" stroke="#16231F" stroke-opacity=".13" stroke-width="1.4" stroke-linecap="round">
+          <path d="M72 190 Q110 208 150 188"/><path d="M66 166 Q104 184 143 164"/>
+          <path d="M82 144 Q116 161 150 142"/><path d="M75 122 Q104 138 133 120"/>
+          <path d="M92 102 Q115 116 138 100"/><path d="M89 85 Q107 96 124 83"/>
+        </g>
+        <g id="cherry" opacity="0">
+          <path d="M110 50 Q116 40 124 36" stroke="#4A7A2E" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="109" cy="53" r="9.5" fill="var(--cherry)"/>
+          <circle cx="106" cy="50" r="2.6" fill="#fff" opacity=".45"/>
+        </g>
+      </svg>
+      <div class="figs">
+        <div class="pctv" id="pctv">0%</div>
+        <div class="cnt"><b id="doneCnt">0</b> of <span id="totCnt">36</span> steps<br><b id="itemCnt">0</b> of 12 items closed out</div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toolbar">
+    <div class="seg" role="group" aria-label="Phase">
+      <button type="button" data-phase="all" aria-pressed="true">All phases</button>
+      <button type="button" data-phase="0" aria-pressed="false">Phase 1</button>
+      <button type="button" data-phase="1" aria-pressed="false">Phase 2</button>
+    </div>
+    <div class="seg" role="group" aria-label="Status">
+      <button type="button" data-status="all" aria-pressed="true">All</button>
+      <button type="button" data-status="open" aria-pressed="false">Open</button>
+      <button type="button" data-status="done" aria-pressed="false">Done</button>
+    </div>
+    <label class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg>
+      <input id="q" type="search" placeholder="Search contacts, permits, tasks&hellip;" aria-label="Search the roadmap">
+    </label>
+    <button class="ghostbtn" id="expandAll" type="button">Expand all</button>
+    <button class="ghostbtn" id="resetAll" type="button">Clear checks</button>
+  </nav>
+
+  <main id="board"></main>
+  <div class="empty hidden" id="empty">Nothing matches that filter.</div>
+</div>
+
+<script>
+const DATA = {"title": "Frozen Dessert Commercialization Roadmap", "subtitle": "Operational, legal, and growth execution plan from market validation to permanent retail storefront.", "phases": [{"title": "Phase 1: Farmers Market Launchpad", "badge": "Immediate Validation", "items": [{"num": "1", "title": "Food Licensing & Health Regulations", "blocks": [{"kind": "plain", "title": "Rationale", "text": "Frozen dairy, alternative milks, and cut fruit are Time/Temperature Control for Safety (TCS) foods. They do not fall under Michigan Cottage Food Law and require active health department licensing to operate at public markets."}, {"kind": "plain", "title": "Potential Outcomes", "text": "Securing a Temporary Food Establishment (TFE) permit or a Mobile Food License unlocks immediate sales permission across all local Kent County farmers markets."}, {"kind": "pitfall", "title": "Pitfalls to Avoid", "text": "Assuming fruit soft serve is exempt because it lacks traditional dairy; health inspectors can instantly shut down a booth lacking an engineered mobile handwashing station with heated water."}], "action": {"title": "Questions to Ask & Preparation", "bullets": ["<strong>Ask:</strong> \"Since our machine processes frozen fruit, frozen yogurt cubes, and plant milks on-site rather than pre-packaging, does this operation qualify for a standard Temporary Food Establishment (TFE) permit, or do we need a full Mobile Food Unit License?\"", "<strong>Ask for:</strong> The Temporary Food License Application packet, the Mobile Handwash Station checklist, and the specific guidelines for on-site warewashing/utensil cleaning.", "<strong>Prepare:</strong> Draw a birds-eye schematic of your market tent layout, showing the exact placement of your fruit extrusion machine, cold transport coolers, waste water bucket, and a dedicated 5-gallon gravity-fed insulated hot water container for handwashing."], "contact": "<strong>Contact:</strong> Kent County Health Department \u2014 Environmental Health Division<br> <strong>Address:</strong> 700 Fuller Ave NE, Grand Rapids, MI 49503<br> <strong>Phone:</strong> (616) 632-6900 | <strong>Email:</strong> environmentalhealth@kentcountymi.gov"}}, {"num": "2", "title": "Certified Commissary Kitchen Agreement", "blocks": [{"kind": "plain", "title": "Rationale", "text": "The Kent County Health Department requires an approved commercial base for washing, peeling, and cutting bulk fruit, freezing cubes into silicone trays, and sanitizing commercial auger equipment. You cannot legally use your residential kitchen."}, {"kind": "plain", "title": "Potential Outcomes", "text": "Establishes an official, licensed production headquarters that passes health department scrutiny, while unlocking access to industrial reach-in blast freezers to prep your raw fruit inventory."}, {"kind": "pitfall", "title": "Pitfalls to Avoid", "text": "Signing an hourly rental agreement without ensuring they have massive, uncrowded freezer space available; if your fruit or plant-milk trays thaw due to cramped shared storage, your inventory is ruined."}], "action": {"title": "Questions to Ask & Preparation", "bullets": ["<strong>Ask:</strong> \"What are your peak usage hours, and do you have dedicated commercial reach-in freezer space available for us to store our pre-portioned silicone fruit cube trays overnight?\"", "<strong>Ask for:</strong> A blank copy of your standard Commissary Agreement Letter (required by the health department) and your current hourly/monthly rate schedule for dry and cold storage.", "<strong>Prepare:</strong> Calculate exactly how many cubic feet of freezer storage you need to hold enough frozen cubes for a 200-serving market weekend. Bring copies of your food handler certifications to your tour."], "contact": "<strong>Contact:</strong> Grand Rapids Downtown Market Incubator Kitchen<br> <strong>Address:</strong> 435 Ionia Ave SW, Grand Rapids, MI 49503<br> <strong>Contact Person:</strong> Ryan Bolhuis (Culinary Operations Manager)<br> <strong>Phone:</strong> (616) 805-5308 | <strong>Email:</strong> incubator@downtownmarketgr.com"}}, {"num": "3", "title": "Mobile Point-of-Sale (POS) & Payment Hardware", "blocks": [{"kind": "plain", "title": "Rationale", "text": "Accepting modern contactless credit cards and mobile digital wallets keeps lines moving fast. It also tracks hourly transaction velocities, itemizes popular fruit combinations, and securely builds your customer customer list."}, {"kind": "plain", "title": "Potential Outcomes", "text": "A highly efficient, friction-free transaction line that boosts average order totals by 15\u201325% via intuitive, automated on-screen tipping prompts."}, {"kind": "pitfall", "title": "Pitfalls to Avoid", "text": "Experiencing sudden cellular dead-zones at crowded open-air markets that cause your payment processing to drop entirely; you must use hardware that supports a true offline mode."}], "action": {"title": "Questions to Ask & Preparation", "bullets": ["<strong>Ask:</strong> \"How does your terminal handle transactions when cellular signal drops completely, and what is the maximum dollar limit or time window allowed for storing offline transactions?\"", "<strong>Ask for:</strong> A direct hardware feature comparison between the standard Square Terminal and the Toast Go handheld unit, focusing on outdoor screen visibility and battery lifespan.", "<strong>Prepare:</strong> Set up your backend digital inventory dashboard now. Create easy, single-tap item tiles for your test flavors (e.g., \"Pure Banana Base,\" \"Raspberry-Banana Blend\") along with specific modification buttons for premium dry toppings."], "contact": "<strong>Contact:</strong> Square Small Business Sales & Retail Support<br> <strong>Website:</strong> squareup.com | <strong>Phone:</strong> (855) 700-6000"}}, {"num": "4", "title": "Mobile Cold Chain & On-Site Electrical Power", "blocks": [{"kind": "plain", "title": "Rationale", "text": "Your 750W real-fruit extrusion blender demands heavy electrical torque, and your pre-frozen fruit cubes must stay perfectly tempered between 0\u00b0F and 10\u00b0F on-site without melting into an unusable liquid slush."}, {"kind": "plain", "title": "Potential Outcomes", "text": "Continuous, silent machine operation for 4+ hours of intense market service without reliance on loud gas generators or unreliable, overloaded market breaker boxes."}, {"kind": "pitfall", "title": "Pitfalls to Avoid", "text": "Tripping an entire market row's shared circuit breaker by plugging in an unverified appliance, or having fruit cubes melt together into a solid block due to cheap cooler insulation."}], "action": {"title": "Questions to Ask & Preparation", "bullets": ["<strong>Ask:</strong> \"What is the peak surge wattage draw of this 750W motor when it hits a rock-solid frozen ingredient, and what pure sine wave battery capacity do you recommend to run it safely for 5 continuous hours?\"", "<strong>Ask for:</strong> The exact mechanical user manual for your specific machine model, detailing running vs. startup amps and certified voltage tolerances.", "<strong>Prepare:</strong> Look at high-capacity portable battery power stations (like EcoFlow Delta or Jackery Pro). Secure commercial heavy-duty insulated transport coolers and source local food-grade dry ice slabs to keep the ingredient cubes separated and frozen hard."], "contact": "<strong>Contact:</strong> EcoFlow Commercial & Technical Product Support<br> <strong>Website:</strong> ecoflow.com | <strong>Phone:</strong> (800) 361-4781"}}, {"num": "5", "title": "Social Capture & Viral Sharing Trigger", "blocks": [{"kind": "plain", "title": "Rationale", "text": "Farmers market patrons love sharing unique, aesthetic food discoveries. Capturing their attention at the exact moment of purchase allows you to build a local digital audience that will follow you directly to your permanent storefront."}, {"kind": "plain", "title": "Potential Outcomes", "text": "A highly engaged Instagram and text-club community that generates free word-of-mouth marketing, giving you a ready-made local crowd on your retail opening day."}, {"kind": "pitfall", "title": "Pitfalls to Avoid", "text": "Using boring, tiny signs that say \"follow us on social media\" with no immediate value; customers won't deal with clunky search text while holding a melting frozen dessert."}], "action": {"title": "Questions to Ask & Preparation", "bullets": ["<strong>Ask:</strong> \"What is our clear, unmistakable, punchy value proposition for a customer to scan this QR code right now while standing at our market counter?\"", "<strong>Ask for:</strong> An optimized short-link and high-contrast vector QR code generated through a reliable platform (like Linktree or Bitly) to track click analytics.", "<strong>Prepare:</strong> Secure your brand handles across Instagram, TikTok, and Facebook. Design a high-visibility, professional 8x10 counter sign that says: <em>\"Tag our swirl on your Instagram Story for a free premium topping right now!\"</em> or <em>\"Join our Gaslight VIP Taste Club for exclusive flavor testing invites.\"</em>"], "contact": "<strong>Contact:</strong> Linktree Platform & Analytics Support<br> <strong>Website:</strong> linktr.ee | <strong>Support:</strong> support.linktr.ee"}}, {"num": "6", "title": "General Liability & Vendor Insurance", "blocks": [{"kind": "plain", "title": "Rationale", "text": "Organized farmers markets and city pop-up events mandate a valid Certificate of Insurance (COI) to shield them from financial liabilities stemming from potential slip-and-falls, property damage, or food safety incidents."}, {"kind": "plain", "title": "Potential Outcomes", "text": "Immediate approval to secure high-traffic booths at premium West Michigan markets, street fairs, and seasonal festivals."}, {"kind": "pitfall", "title": "Pitfalls to Avoid", "text": "Paying expensive annual commercial premiums to traditional brokers before checking specialized, low-cost food vendor plans designed exactly for mobile startups."}], "action": {"title": "Questions to Ask & Preparation", "bullets": ["<strong>Ask:</strong> \"Does your standard policy fully cover on-site food processing using high-torque commercial machinery, and are there any restrictions on alternative plant-milk ingredients?\"", "<strong>Ask for:</strong> A sample Certificate of Insurance (COI) detailing aggregate limits, product liability parameters, and the timeline for adding custom market entities as an additional insured.", "<strong>Prepare:</strong> Gather your formal entity details. Review online specialty plans like FLIP (Food Liability Insurance Program) or ACT Insurance, which typically cost around $300\u2013$400 annually and offer instant document downloads."], "contact": "<strong>Contact:</strong> FLIP (Food Liability Insurance Program)<br> <strong>Website:</strong> flipprogram.com | <strong>Phone:</strong> (844) 520-6992"}}]}, {"title": "Phase 2: Gaslight Village Storefront", "badge": "Target: Spring Opening", "items": [{"num": "1", "title": "Legal Entity & Business Banking Structure", "blocks": [{"kind": "plain", "title": "Rationale", "text": "Commercial lease agreements, corporate trade accounts, and municipal construction permits require a verified legal business entity to insulate your personal assets from corporate liabilities."}, {"kind": "plain", "title": "Potential Outcomes", "text": "Clean liability protection, an established path to build commercial credit, and a seamless corporate structure to handle equipment depreciation write-offs."}, {"kind": "pitfall", "title": "Pitfalls to Avoid", "text": "Co-mingling start-up funds with personal bank accounts, or failing to register your Michigan Sales Tax License early, which halts your ability to buy tax-free wholesale ingredients."}], "action": {"title": "Questions to Ask & Preparation", "bullets": ["<strong>Ask:</strong> \"What specific documentation is required to ensure our new entity is fully cleared to collect and remit Michigan sales tax on prepared, immediate-consumption frozen desserts?\"", "<strong>Ask for:</strong> The Michigan LARA LLC Articles of Organization confirmation and the official IRS EIN assignment letter.", "<strong>Prepare:</strong> File your business name online via the Michigan LARA portal. Once assigned, open a dedicated commercial business checking account and register with the Michigan Department of Treasury for your active sales tax license."], "contact": "<strong>Contact:</strong> Michigan Department of Licensing and Regulatory Affairs (LARA)<br> <strong>Address:</strong> 2407 N Grand River Ave, Lansing, MI 48906<br> <strong>Phone:</strong> (517) 241-6470 | <strong>Website:</strong> michigan.gov/lara"}}, {"num": "2", "title": "Gaslight Village Site Scouting & Lease Negotiation", "blocks": [{"kind": "plain", "title": "Rationale", "text": "Gaslight Village delivers elite, highly walkable family foot traffic, but micro-retail spaces here require careful scrutiny regarding plumbing layouts, electrical service limits, and tenant structural responsibilities."}, {"kind": "plain", "title": "Potential Outcomes", "text": "Securing a prominent, high-visibility retail location with favorable Tenant Improvement (TI) allowances and a free-rent buildout period extending all winter long ahead of your spring grand opening."}, {"kind": "pitfall", "title": "Pitfalls to Avoid", "text": "Signing an aggressive retail lease on an older building that lacks 200A+ electrical panels or adequate under-floor plumbing lines, forcing you to fund astronomical utility retrofits out-of-pocket."}], "action": {"title": "Questions to Ask & Preparation", "bullets": ["<strong>Ask:</strong> \"What is the exact amperage and phase configuration of the existing electrical service panel, and does the lease include landlord concessions or TI allowances for adding food-grade floor drains and an in-ground grease interceptor?\"", "<strong>Ask for:</strong> A complete architectural CAD floor plan of the property, a detailed utility schematic, and a clear breakdown of Triple Net (NNN) common-area maintenance fees.", "<strong>Prepare:</strong> Retain an experienced local West Michigan tenant-only commercial real estate broker to uncover unlisted micro-spaces (500\u20131,200 sq ft) around Wealthy St SE or Bagley Ave, and build a formal presentation detailing your concept's clean, premium design aesthetic."], "contact": "<strong>Contact:</strong> City of East Grand Rapids \u2014 Planning & Zoning Administration<br> <strong>Address:</strong> 750 Lakeside Drive SE, East Grand Rapids, MI 49506<br> <strong>Contact Person:</strong> Jay Gianotti (Zoning Administrator)<br> <strong>Phone:</strong> (616) 940-4817 | <strong>Email:</strong> jgianotti@eastgrmi.gov"}}, {"num": "3", "title": "Municipal Permitting & Health Plan Review", "blocks": [{"kind": "plain", "title": "Rationale", "text": "A permanent commercial food facility must receive formal architectural, plumbing, and mechanical approvals from both East Grand Rapids zoning boards and Kent County health regulators before construction can begin."}, {"kind": "plain", "title": "Potential Outcomes", "text": "Your construction permits sail through approvals on schedule with no unexpected, costly construction orders during intermediate electrical or plumbing inspections."}, {"kind": "pitfall", "title": "Pitfalls to Avoid", "text": "Commencing physical interior framing or buying equipment before the Kent County Health Department officially signs off on your 3-compartment sink layout and commercial floor drain intersections."}], "action": {"title": "Questions to Ask & Preparation", "bullets": ["<strong>Ask:</strong> \"Does our specific real-fruit extrusion operation require a commercial hood system, or can we operate with standard mechanical ventilation? What are the local restrictions regarding exterior business signage in Gaslight Village?\"", "<strong>Ask for:</strong> The Kent County Fixed Facility Food Service Plan Review Application packet and the East Grand Rapids Commercial Change of Use building application forms.", "<strong>Prepare:</strong> Schedule a complimentary \"Conceptual Site Plan Review\" meeting with the East Grand Rapids Zoning Administrator. Bring a simple, hand-drawn sketch of your proposed kitchen, service counter, and equipment placements to flag structural issues early."], "contact": "<strong>Contact:</strong> Kent County Health Department \u2014 Plan Review Section<br> <strong>Address:</strong> 700 Fuller Ave NE, Grand Rapids, MI 49503<br> <strong>Phone:</strong> (616) 632-6900 | <strong>Email:</strong> environmentalhealth@kentcountymi.gov"}}, {"num": "4", "title": "Commercial Equipment & Workflow Blueprint", "blocks": [{"kind": "plain", "title": "Rationale", "text": "Scaling up from farmers market testing to a high-volume retail storefront requires a highly optimized operational workflow: massive bulk fruit storage, commercial blast freezing lines, high-throughput blending, and dedicated sanitation spaces."}, {"kind": "plain", "title": "Potential Outcomes", "text": "An ultra-fast, 45-second customer order-to-handout cycle time that easily handles intense after-school rushes and crowded summer evening lines with minimal labor overhead."}, {"kind": "pitfall", "title": "Pitfalls to Avoid", "text": "Accidentally buying cheaper commercial equipment that requires specialized 3-phase electrical power when your retail space only provides standard single-phase power, causing massive deployment delays."}], "action": {"title": "Questions to Ask & Preparation", "bullets": ["<strong>Ask:</strong> \"What are the exact voltage, amperage, and single-phase electrical requirements for this commercial equipment, and what is the maximum ambient heat output we need to plan for with our HVAC system?\"", "<strong>Ask for:</strong> Printable manufacturer specification sheets (spec sheets) and certified NSF/ANSI sanitation documentation for every appliance you plan to buy.", "<strong>Prepare:</strong> Map out your commercial equipment layout. Your lineup should include multiple heavy-duty commercial fruit blenders, dedicated under-counter glass display freezers for pre-sorted fruit boxes, commercial ice makers, a certified 3-compartment dishwashing sink, and heavy NSF-rated wire storage racks."], "contact": "<strong>Contact:</strong> Gordon Food Service (GFS) Store & Equipment Design Team<br> <strong>Local Headquarters:</strong> 1300 Gezon Pkwy SW, Wyoming, MI 49509<br> <strong>Phone:</strong> (888) 437-3663 | <strong>Website:</strong> gfs.com"}}, {"num": "5", "title": "Wholesale Supply Chain & Bulk Packaging", "blocks": [{"kind": "plain", "title": "Rationale", "text": "Buying ingredients or plain packaging at retail prices severely caps your profit margins. Shifting to wholesale IQF (Individually Quick Frozen) fruit cases and bulk custom-branded compostable packaging protects your unit economics."}, {"kind": "plain", "title": "Potential Outcomes", "text": "Dropping your Cost of Goods Sold (COGS) below 22% per serving while delivering a high-end, cohesive, and premium tactile brand experience directly into your customers' hands."}, {"kind": "pitfall", "title": "Pitfalls to Avoid", "text": "Underestimating production timelines for custom-printed paper cups, which routinely take 8\u201312 weeks to manufacture; delaying this order means launching your store with plain white generic cups."}], "action": {"title": "Questions to Ask & Preparation", "bullets": ["<strong>Ask:</strong> \"What are the minimum order quantities (MOQs) for custom-branded compostable dessert cups, and can we set up a repeating delivery schedule for pallet-sized cases of IQF frozen fruit?\"", "<strong>Ask for:</strong> A wholesale product catalog, bulk pricing matrix sheets, and official digital dieline template files for your packaging graphic designs.", "<strong>Prepare:</strong> Finalize your initial flavor lineup to estimate your monthly fruit volume requirements. Reach out to regional commercial food distributors to open your corporate trade accounts."], "contact": "<strong>Contact:</strong> Sysco West Michigan Wholesale Account Services<br> <strong>Address:</strong> 3700 76th St SE, Caledonia, MI 49316<br> <strong>Phone:</strong> (616) 949-3700 | <strong>Website:</strong> sysco.com"}}, {"num": "6", "title": "Brand Launch Campaign & VIP Soft Opening", "blocks": [{"kind": "plain", "title": "Rationale", "text": "An explosive spring opening depends on early community energy. Activating the email and social media audience you built during the summer farmers market phase ensures big lines on day one and immediate local buzz."}, {"kind": "plain", "title": "Potential Outcomes", "text": "A highly profitable, cash-flow positive opening weekend, widespread local social media visibility, and strong early support from the surrounding Gaslight Village business community."}, {"kind": "pitfall", "title": "Pitfalls to Avoid", "text": "Opening your doors to the general public without a low-stress \"friends and family\" trial run; your team needs a safe environment to iron out POS hiccups, blender cleaning cycles, and counter bottlenecks."}], "action": {"title": "Questions to Ask & Preparation", "bullets": ["<strong>Ask:</strong> \"How can we structure our soft opening times to gather direct feedback from neighboring Gaslight Village merchants and local families before our public ribbon-cutting ceremony?\"", "<strong>Ask for:</strong> Community event marketing guidelines from the East Grand Rapids Downtown Development Authority (DDA) to coordinate your opening with local foot traffic calendars.", "<strong>Prepare:</strong> Design a structured, tiered grand opening schedule: 1) A private Friends & Family night, 2) A dedicated Gaslight Village Neighborhood Preview, and 3) A public Grand Opening event backed by high-value digital loyalty incentives."], "contact": "<strong>Contact:</strong> East Grand Rapids Downtown Development Authority (DDA)<br> <strong>Address:</strong> 750 Lakeside Drive SE, East Grand Rapids, MI 49506<br> <strong>Phone:</strong> (616) 949-2110 | <strong>Website:</strong> eastgrmi.gov"}}]}]};
+
+(function(){
+  "use strict";
+  const board = document.getElementById('board');
+  const state = {phase:'all', status:'all', q:'', checks:{}, open:{}};
+  const key = (p,i,b) => 'p'+p+'i'+i+'b'+b;
+
+  /* ----- persistence (silently no-ops where unavailable) ----- */
+  const STORE = 'frozen-dessert-roadmap-v1';
+  async function save(){
+    try{ if(window.storage) await window.storage.set(STORE, JSON.stringify(state.checks)); }catch(e){}
+  }
+  async function load(){
+    try{
+      if(!window.storage) return;
+      const r = await window.storage.get(STORE);
+      if(r && r.value){ state.checks = JSON.parse(r.value); paint(); }
+    }catch(e){}
+  }
+
+  /* ----- linkify contacts ----- */
+  function linkify(h){
+    h = h.replace(/(\(\d{3}\)\s?\d{3}-\d{4})/g, '<a href="tel:$1">$1</a>');
+    h = h.replace(/([\w.+-]+@[\w-]+\.[\w.]+)/g, '<a href="mailto:$1">$1</a>');
+    h = h.replace(/(?<=<\/strong>\s)([\w-]+\.(?:gov|com|org|net))(?=\s|<|$)/g, '<a href="https://$1" target="_blank" rel="noopener">$1</a>');
+    return h;
+  }
+
+  const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+  const CHEV  = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function build(){
+    DATA.phases.forEach((ph, pi)=>{
+      const sec = document.createElement('section');
+      sec.className = 'phase';
+      sec.dataset.accent = pi === 0 ? 'butter' : 'aqua';
+      sec.dataset.phase = pi;
+      sec.innerHTML =
+        '<div class="phase-head">' +
+          '<span class="phase-n">Phase ' + (pi+1) + '</span>' +
+          '<h2>' + ph.title.replace(/^Phase \d+:\s*/,'') + '</h2>' +
+          '<span class="badge">' + ph.badge + '</span>' +
+          '<span class="phase-bar"><i id="bar'+pi+'" style="width:0%"></i></span>' +
+          '<span class="phase-count" id="pc'+pi+'"></span>' +
+        '</div><div class="items"></div>';
+      const list = sec.querySelector('.items');
+
+      ph.items.forEach((it, ii)=>{
+        const card = document.createElement('article');
+        card.className = 'item';
+        card.dataset.p = pi; card.dataset.i = ii;
+        card.dataset.hay = (it.title + ' ' + it.blocks.map(b=>b.title+' '+b.text).join(' ') + ' ' +
+                            it.action.bullets.join(' ') + ' ' + it.action.contact).replace(/<[^>]+>/g,'').toLowerCase();
+
+        const blocks = it.blocks.map(b=>{
+          const cls = b.kind === 'pitfall' ? 'block pitfall'
+                    : /outcome/i.test(b.title) ? 'block outcome' : 'block';
+          return '<div class="'+cls+'"><div class="bt">'+b.title+'</div>'+b.text+'</div>';
+        }).join('');
+
+        const tasks = it.action.bullets.map((b,bi)=>
+          '<li class="task" data-b="'+bi+'" role="checkbox" tabindex="0" aria-checked="false">' +
+            '<span class="box">'+CHECK+'</span><span class="txt">'+b+'</span></li>').join('');
+
+        card.innerHTML =
+          '<button class="head" type="button" aria-expanded="false">' +
+            '<span class="chip"><span>'+it.num+'</span></span>' +
+            '<span class="htitle">'+it.title+'</span>' +
+            '<span class="dots">'+it.action.bullets.map(()=>'<i></i>').join('')+'</span>' +
+            '<span class="steps">0/'+it.action.bullets.length+'</span>' + CHEV +
+          '</button>' +
+          '<div class="body"><div class="grid">' + blocks +
+            '<div class="block action"><div class="bt">'+it.action.title+'</div>' +
+              '<ul class="tasks">'+tasks+'</ul>' +
+              (it.action.contact ? '<div class="contact">'+linkify(it.action.contact)+'</div>' : '') +
+              '<div class="rowend"><button class="markbtn" type="button">Mark item complete</button></div>' +
+            '</div>' +
+          '</div></div>';
+
+        card.querySelector('.head').addEventListener('click', ()=>{
+          const k = pi+'-'+ii;
+          state.open[k] = !state.open[k];
+          card.classList.toggle('open', !!state.open[k]);
+          card.querySelector('.head').setAttribute('aria-expanded', String(!!state.open[k]));
+        });
+        card.querySelectorAll('.task').forEach(t=>{
+          const toggle = ()=>{
+            const k = key(pi,ii,t.dataset.b);
+            state.checks[k] = !state.checks[k];
+            paint(); save();
+          };
+          t.addEventListener('click', toggle);
+          t.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='Enter'){e.preventDefault();toggle();} });
+        });
+        card.querySelector('.markbtn').addEventListener('click', ()=>{
+          const n = it.action.bullets.length;
+          const all = it.action.bullets.every((_,bi)=>state.checks[key(pi,ii,bi)]);
+          for(let bi=0;bi<n;bi++) state.checks[key(pi,ii,bi)] = !all;
+          paint(); save();
+        });
+        list.appendChild(card);
+      });
+      board.appendChild(sec);
+    });
+  }
+
+  function paint(){
+    let done = 0, total = 0, itemsDone = 0;
+    DATA.phases.forEach((ph,pi)=>{
+      let pd = 0, pt = 0, pItems = 0;
+      ph.items.forEach((it,ii)=>{
+        const card = board.querySelector('.item[data-p="'+pi+'"][data-i="'+ii+'"]');
+        const n = it.action.bullets.length;
+        let c = 0;
+        card.querySelectorAll('.task').forEach(t=>{
+          const on = !!state.checks[key(pi,ii,t.dataset.b)];
+          t.classList.toggle('on', on);
+          t.setAttribute('aria-checked', String(on));
+          if(on) c++;
+        });
+        card.querySelectorAll('.dots i').forEach((d,di)=>d.classList.toggle('on', di < c));
+        card.querySelector('.steps').textContent = c+'/'+n;
+        const complete = c === n;
+        card.classList.toggle('done', complete);
+        card.querySelector('.markbtn').textContent = complete ? 'Item complete' : 'Mark item complete';
+        done += c; total += n; pd += c; pt += n;
+        if(complete){ itemsDone++; pItems++; }
+      });
+      document.getElementById('bar'+pi).style.width = (pt? pd/pt*100 : 0)+'%';
+      document.getElementById('pc'+pi).textContent = pItems+' of '+ph.items.length+' complete';
+    });
+
+    const frac = total ? done/total : 0;
+    document.getElementById('pctv').textContent = Math.round(frac*100)+'%';
+    document.getElementById('doneCnt').textContent = done;
+    document.getElementById('totCnt').textContent = total;
+    document.getElementById('itemCnt').textContent = itemsDone;
+    const yB = 318, yT = 50, fy = yB - frac*(yB-yT);
+    const fr = document.getElementById('fillRect');
+    fr.setAttribute('y', fy); fr.setAttribute('height', yB-fy);
+    document.getElementById('cherry').setAttribute('opacity', frac >= 1 ? '1' : '0');
+    filter();
+  }
+
+  function filter(){
+    let shown = 0;
+    board.querySelectorAll('.item').forEach(card=>{
+      const pi = card.dataset.p;
+      const okPhase = state.phase === 'all' || state.phase === pi;
+      const isDone = card.classList.contains('done');
+      const okStatus = state.status === 'all' || (state.status === 'done') === isDone;
+      const okQ = !state.q || card.dataset.hay.includes(state.q);
+      const show = okPhase && okStatus && okQ;
+      card.classList.toggle('hide', !show);
+      if(show){
+        shown++;
+        if(state.q){ card.classList.add('open'); card.querySelector('.head').setAttribute('aria-expanded','true'); }
+      }
+    });
+    board.querySelectorAll('.phase').forEach(sec=>{
+      sec.classList.toggle('hidden', !sec.querySelector('.item:not(.hide)'));
+    });
+    document.getElementById('empty').classList.toggle('hidden', shown > 0);
+  }
+
+  document.querySelectorAll('[data-phase]').forEach(b=>b.addEventListener('click',()=>{
+    state.phase = b.dataset.phase;
+    document.querySelectorAll('[data-phase]').forEach(x=>x.setAttribute('aria-pressed', String(x===b)));
+    filter();
+  }));
+  document.querySelectorAll('[data-status]').forEach(b=>b.addEventListener('click',()=>{
+    state.status = b.dataset.status;
+    document.querySelectorAll('[data-status]').forEach(x=>x.setAttribute('aria-pressed', String(x===b)));
+    filter();
+  }));
+  document.getElementById('q').addEventListener('input', e=>{
+    state.q = e.target.value.trim().toLowerCase();
+    filter();
+  });
+  document.getElementById('expandAll').addEventListener('click', e=>{
+    const opening = e.target.textContent === 'Expand all';
+    board.querySelectorAll('.item').forEach(c=>{
+      c.classList.toggle('open', opening);
+      c.querySelector('.head').setAttribute('aria-expanded', String(opening));
+      state.open[c.dataset.p+'-'+c.dataset.i] = opening;
+    });
+    e.target.textContent = opening ? 'Collapse all' : 'Expand all';
+  });
+  document.getElementById('resetAll').addEventListener('click', ()=>{
+    state.checks = {}; paint(); save();
+  });
+
+  build(); paint(); load();
+})();
+</script>
+</body>
+</html>
