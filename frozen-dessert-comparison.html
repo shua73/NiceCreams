@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How it's made — ice cream vs soft serve vs froyo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF2F2;
+    --card:#FBFCFC;
+    --ink:#182022;
+    --ink-soft:#54605F;
+    --ink-faint:#8A9493;
+    --line:#DCE3E2;
+    --line-soft:#E7ECEB;
+    --cold:#2E7D7B;              /* structural / frozen accent */
+    /* product hues */
+    --ic:#B07A16;   --ic-bg:#FBF2DD;   --ic-line:#EAD6A6;
+    --ss:#D26A4C;   --ss-bg:#FBEBE4;   --ss-line:#F0CDBF;
+    --fy:#AC3B70;   --fy-bg:#F9E7F0;   --fy-line:#EEC4DA;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Inter",system-ui,sans-serif; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px; margin:0 auto; padding:34px 22px 80px}
+
+  /* ---- masthead ---- */
+  .eyebrow{
+    font-family:"Space Mono",monospace; font-size:12px; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--cold); margin:0 0 10px;
+  }
+  h1{
+    font-family:"Fraunces",serif; font-weight:600; font-size:clamp(30px,5vw,50px);
+    line-height:1.02; letter-spacing:-.01em; margin:0 0 12px;
+  }
+  h1 em{font-style:italic; font-weight:400; color:var(--cold)}
+  .lede{max-width:60ch; color:var(--ink-soft); font-size:15px; margin:0 0 26px}
+
+  /* ---- the comparison frame ---- */
+  .frame{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    overflow:hidden;
+  }
+  .scroll{overflow-x:auto}
+  .grid{min-width:720px; width:100%}
+
+  /* header row of products */
+  .head{
+    display:grid; grid-template-columns:200px 1fr 1fr 1fr;
+    position:sticky; top:0; z-index:5; background:var(--card);
+    border-bottom:1px solid var(--line);
+  }
+  .head .rowlabel{border:0}
+  .prod{padding:18px 18px 16px; border-left:1px solid var(--line-soft)}
+  .prod .tag{
+    font-family:"Space Mono",monospace; font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase;
+  }
+  .prod h2{font-family:"Fraunces",serif; font-weight:500; font-size:21px; margin:3px 0 4px; letter-spacing:-.01em}
+  .prod p{margin:0; font-size:12.5px; color:var(--ink-soft); line-height:1.4}
+  .swatch{width:30px;height:5px;border-radius:3px;margin-bottom:9px}
+  .ic .tag{color:var(--ic)} .ic .swatch{background:var(--ic)}
+  .ss .tag{color:var(--ss)} .ss .swatch{background:var(--ss)}
+  .fy .tag{color:var(--fy)} .fy .swatch{background:var(--fy)}
+
+  /* section band */
+  .band{
+    display:flex; align-items:baseline; gap:12px;
+    padding:15px 18px; background:var(--paper);
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  }
+  .band .n{font-family:"Space Mono",monospace; font-size:12px; color:var(--cold); font-weight:700}
+  .band h3{font-family:"Fraunces",serif; font-weight:500; font-size:17px; margin:0; letter-spacing:-.01em}
+  .band .note{font-size:12px; color:var(--ink-faint); margin-left:auto; text-align:right}
+
+  /* data rows */
+  .row{display:grid; grid-template-columns:200px 1fr 1fr 1fr; border-top:1px solid var(--line-soft)}
+  .row:first-child{border-top:0}
+  .rowlabel{
+    padding:14px 18px; font-size:13px; font-weight:500; color:var(--ink);
+    background:var(--card);
+  }
+  .rowlabel small{display:block; font-weight:400; font-size:11.5px; color:var(--ink-faint); margin-top:2px; line-height:1.35}
+  .cell{
+    padding:14px 18px; border-left:1px solid var(--line-soft);
+    font-size:12.8px; color:var(--ink-soft); line-height:1.5;
+  }
+  .cell strong{color:var(--ink); font-weight:500}
+
+  /* five-component pip meter */
+  .meter{display:flex; align-items:center; gap:8px; margin-bottom:5px}
+  .pips{display:flex; gap:3px}
+  .pip{width:15px;height:8px;border-radius:2px;background:var(--line)}
+  .lvl{font-family:"Space Mono",monospace; font-size:11px; letter-spacing:.04em; color:var(--ink-faint)}
+  .val{font-family:"Space Mono",monospace; font-size:11.5px; color:var(--ink); margin-left:auto}
+  .ic-cell .pip.on{background:var(--ic)} .ss-cell .pip.on{background:var(--ss)} .fy-cell .pip.on{background:var(--fy)}
+  .micro{font-size:11.5px; color:var(--ink-faint); line-height:1.4; display:block}
+
+  /* verdict pills for packability */
+  .verdict{
+    display:inline-block; font-family:"Space Mono",monospace; font-size:11px;
+    letter-spacing:.08em; text-transform:uppercase; padding:3px 9px; border-radius:20px;
+    margin-bottom:7px;
+  }
+  .v-yes{background:#E2F0E4; color:#2C6B3A}
+  .v-tweak{background:#FBF0DA; color:#8A6410}
+  .v-no{background:#F6E3DE; color:#B0472B}
+
+  /* ---- texture agents ---- */
+  .agents{margin-top:34px}
+  .agents-head{display:flex; align-items:baseline; gap:12px; margin:0 2px 4px}
+  .agents-head .n{font-family:"Space Mono",monospace; font-size:12px; color:var(--cold); font-weight:700}
+  .agents-head h3{font-family:"Fraunces",serif; font-weight:500; font-size:19px; margin:0; letter-spacing:-.01em}
+  .agents-sub{font-size:13px; color:var(--ink-soft); max-width:70ch; margin:0 2px 18px}
+  .agents-sub b{color:var(--ink); font-weight:500}
+
+  .cat{font-family:"Space Mono",monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+       color:var(--cold); margin:22px 2px 10px; display:flex; align-items:center; gap:10px}
+  .cat::after{content:""; flex:1; height:1px; background:var(--line)}
+
+  .agrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(232px,1fr)); gap:10px}
+  .agent{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:13px 14px 12px;
+  }
+  .agent .name{font-weight:500; font-size:14px; margin:0 0 3px}
+  .agent .role{font-size:12px; color:var(--ink-soft); line-height:1.45; margin:0 0 10px}
+  .chips{display:flex; gap:5px}
+  .chip{
+    font-family:"Space Mono",monospace; font-size:10.5px; letter-spacing:.06em;
+    padding:2px 7px; border-radius:6px; border:1px solid var(--line);
+    color:var(--ink-faint); background:transparent;
+  }
+  .chip.ic-on{background:var(--ic-bg); border-color:var(--ic-line); color:var(--ic)}
+  .chip.ss-on{background:var(--ss-bg); border-color:var(--ss-line); color:var(--ss)}
+  .chip.fy-on{background:var(--fy-bg); border-color:var(--fy-line); color:var(--fy)}
+
+  .legend{
+    display:flex; flex-wrap:wrap; gap:16px 22px; margin:26px 2px 0;
+    padding-top:18px; border-top:1px solid var(--line);
+    font-size:12px; color:var(--ink-soft);
+  }
+  .legend b{color:var(--ink); font-weight:500}
+  .key{display:inline-flex; align-items:center; gap:7px}
+  .kdot{width:13px;height:9px;border-radius:2px}
+
+  .foot{margin:30px 2px 0; font-size:11.5px; color:var(--ink-faint); line-height:1.6; max-width:78ch}
+
+  @media (max-width:560px){
+    .wrap{padding:24px 14px 60px}
+    .agrid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Frozen dessert · build sheet</p>
+  <h1>How it's made:<br>ice cream, soft serve <em>&amp; froyo</em></h1>
+  <p class="lede">The same five components — ice, protein, fat, sugar, air — tuned three different ways. Fat and air do most of the work; the texture agents and the freezing method decide the rest, including whether it can survive in a pint.</p>
+
+  <div class="frame">
+    <div class="scroll">
+      <div class="grid">
+
+        <!-- product header -->
+        <div class="head">
+          <div class="rowlabel"></div>
+          <div class="prod ic">
+            <div class="swatch"></div>
+            <div class="tag">Traditional</div>
+            <h2>Ice cream</h2>
+            <p>Dairy cream base, hard-frozen and stored cold</p>
+          </div>
+          <div class="prod ss">
+            <div class="swatch"></div>
+            <div class="tag">Served fresh</div>
+            <h2>Soft serve</h2>
+            <p>Low-fat mix, whipped and dispensed on the spot</p>
+          </div>
+          <div class="prod fy">
+            <div class="swatch"></div>
+            <div class="tag">Cultured</div>
+            <h2>Frozen yogurt</h2>
+            <p>Yogurt base, tangy — served soft or packed</p>
+          </div>
+        </div>
+
+        <!-- BASE INGREDIENT -->
+        <div class="band"><span class="n">01</span><h3>Base ingredient</h3><span class="note">what the mix is built on</span></div>
+
+        <div class="row">
+          <div class="rowlabel">Primary base<small>the liquid everything else dissolves into</small></div>
+          <div class="cell"><strong>Cream + whole milk.</strong> Rich dairy, sometimes with a spoon of cream cheese or egg yolk for body.</div>
+          <div class="cell"><strong>Milk + a little cream</strong>, usually from a packaged liquid or powdered mix built for the machine.</div>
+          <div class="cell"><strong>Cultured yogurt + milk.</strong> Greek yogurt for a thicker, higher-protein body; coconut milk for a dairy-free version.</div>
+        </div>
+        <div class="row">
+          <div class="rowlabel">Base options<small>swappable starting points</small></div>
+          <div class="cell">Rarely swapped — dairy cream is the identity.</div>
+          <div class="cell">Dairy mix standard; coconut milk for non-dairy.</div>
+          <div class="cell"><strong>Yogurt · Greek yogurt · coconut milk</strong> — the tangier and thicker the base, the less it needs propping up.</div>
+        </div>
+
+        <!-- FIVE COMPONENTS -->
+        <div class="band"><span class="n">02</span><h3>The five core components</h3><span class="note">bars = relative level · low → high</span></div>
+
+        <!-- ICE -->
+        <div class="row">
+          <div class="rowlabel">Ice<small>water that freezes into crystals — the enemy of smoothness</small></div>
+          <div class="cell ic-cell">
+            <div class="meter"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></span><span class="lvl">Med</span></div>
+            <span class="micro">Most water is frozen at −18 °C; fat and stabilizers keep the crystals tiny so it still reads smooth.</span>
+          </div>
+          <div class="cell ss-cell">
+            <div class="meter"><span class="pips"><i class="pip on"></i><i class="pip"></i><i class="pip"></i></span><span class="lvl">Low</span></div>
+            <span class="micro">Served warm (~−4 °C), so much of the water stays unfrozen — almost no icy bite.</span>
+          </div>
+          <div class="cell fy-cell">
+            <div class="meter"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></span><span class="lvl">Med</span></div>
+            <span class="micro">Similar water load, but acidity + low fat make crystals harder to control — leans on stabilizers.</span>
+          </div>
+        </div>
+        <!-- PROTEIN -->
+        <div class="row">
+          <div class="rowlabel">Protein<small>milk solids &amp; yogurt solids — bind water, build body, hold air</small></div>
+          <div class="cell ic-cell">
+            <div class="meter"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></span><span class="lvl">Med</span><span class="val">~10–11% MSNF</span></div>
+            <span class="micro">Milk solids-not-fat give it structure.</span>
+          </div>
+          <div class="cell ss-cell">
+            <div class="meter"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i></span><span class="lvl">High</span><span class="val">+ milk powder</span></div>
+            <span class="micro">Extra milk powder replaces the missing fat's body.</span>
+          </div>
+          <div class="cell fy-cell">
+            <div class="meter"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i></span><span class="lvl">High</span><span class="val">yogurt-rich</span></div>
+            <span class="micro">Yogurt (esp. Greek) is naturally protein-heavy.</span>
+          </div>
+        </div>
+        <!-- FAT -->
+        <div class="row">
+          <div class="rowlabel">Fat<small>butterfat — richness, slow melt, flavor carrier</small></div>
+          <div class="cell ic-cell">
+            <div class="meter"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i></span><span class="lvl">High</span><span class="val">~10–18%</span></div>
+            <span class="micro">The defining trait — premium sits 14–18%.</span>
+          </div>
+          <div class="cell ss-cell">
+            <div class="meter"><span class="pips"><i class="pip on"></i><i class="pip"></i><i class="pip"></i></span><span class="lvl">Low</span><span class="val">~3–6%</span></div>
+            <span class="micro">Low fat is why it needs more air + emulsifiers.</span>
+          </div>
+          <div class="cell fy-cell">
+            <div class="meter"><span class="pips"><i class="pip on"></i><i class="pip"></i><i class="pip"></i></span><span class="lvl">Low</span><span class="val">~0–6%</span></div>
+            <span class="micro">Nonfat to whole; coconut versions run higher.</span>
+          </div>
+        </div>
+        <!-- SUGAR -->
+        <div class="row">
+          <div class="rowlabel">Sugar<small>sweetness + lowers freezing point → softer scoop</small></div>
+          <div class="cell ic-cell">
+            <div class="meter"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></span><span class="lvl">Med</span><span class="val">~14–17%</span></div>
+            <span class="micro">Balanced so it's scoopable, not rock-hard.</span>
+          </div>
+          <div class="cell ss-cell">
+            <div class="meter"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></span><span class="lvl">Med</span><span class="val">~13–15%</span></div>
+            <span class="micro">Tuned to stay soft at serving temperature.</span>
+          </div>
+          <div class="cell fy-cell">
+            <div class="meter"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i></span><span class="lvl">High</span><span class="val">~15–20%</span></div>
+            <span class="micro">Extra sugar offsets the tang and softens the freeze.</span>
+          </div>
+        </div>
+        <!-- AIR -->
+        <div class="row">
+          <div class="rowlabel">Air<small>"overrun" — whipped-in volume that lightens texture</small></div>
+          <div class="cell ic-cell">
+            <div class="meter"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></span><span class="lvl">Low–Med</span><span class="val">~20–40%</span></div>
+            <span class="micro">Less air = denser, more premium.</span>
+          </div>
+          <div class="cell ss-cell">
+            <div class="meter"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i></span><span class="lvl">High</span><span class="val">~35–60%</span></div>
+            <span class="micro">Continuously whipped — the source of that fluffy lift.</span>
+          </div>
+          <div class="cell fy-cell">
+            <div class="meter"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i></span><span class="lvl">Med–High</span><span class="val">~30–50%</span></div>
+            <span class="micro">Soft-serve-style froyo whips in nearly as much.</span>
+          </div>
+        </div>
+
+        <!-- PROCESS -->
+        <div class="band"><span class="n">03</span><h3>Core process &amp; machinery</h3><span class="note">how it gets frozen</span></div>
+        <div class="row">
+          <div class="rowlabel">Make it<small>mix → freeze → (harden)</small></div>
+          <div class="cell">Mix, pasteurize, homogenize, then <strong>age 4–24 h</strong>. Churn in a batch or continuous freezer (whips air in), draw soft at ~−5 °C, then <strong>harden to −18 °C</strong>.</div>
+          <div class="cell">Liquid mix goes straight into the machine and is <strong>dispensed immediately</strong> at ~−4 to −6 °C. No aging, no hardening step.</div>
+          <div class="cell"><strong>Culture the yogurt</strong> (or start from ready-made), blend the mix, then either run it through a soft-serve machine (shops) or batch-freeze + harden (pints).</div>
+        </div>
+        <div class="row">
+          <div class="rowlabel">Machinery</div>
+          <div class="cell"><strong>Batch or continuous freezer</strong> + a blast / hardening freezer for storage.</div>
+          <div class="cell"><strong>Soft-serve machine</strong> — a chilled cylinder with a scraper blade and a built-in air pump.</div>
+          <div class="cell"><strong>Soft-serve machine</strong> for shops, <em>or</em> batch freezer + hardening freezer for packed pints.</div>
+        </div>
+
+        <!-- PACKABILITY -->
+        <div class="band"><span class="n">04</span><h3>Packability</h3><span class="note">can it be sold in a pint?</span></div>
+        <div class="row">
+          <div class="rowlabel">Pint viability<small>survives freezer storage &amp; heat-shock?</small></div>
+          <div class="cell">
+            <span class="verdict v-yes">Yes — built for it</span>
+            <span class="micro">Designed to be hardened and stored. The fat/sugar/stabilizer balance resists re-crystallizing through storage and temperature swings. <strong>Add:</strong> a stabilizer blend + emulsifier for a clean scoop.</span>
+          </div>
+          <div class="cell">
+            <span class="verdict v-no">Not as-is</span>
+            <span class="micro">Meant to be eaten fresh and soft. Freeze it hard for a pint and it loses the signature texture. To make it work you essentially <strong>reformulate toward low-fat ice cream</strong> — more sugar, solids, and stabilizer.</span>
+          </div>
+          <div class="cell">
+            <span class="verdict v-tweak">Yes — with tweaks</span>
+            <span class="micro"><strong>Add:</strong> extra sugar or corn-syrup solids (lower the freezing point so it scoops and to offset tang), stabilizers for storage, often an emulsifier. Note the live cultures fade in the freezer.</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- TEXTURE AGENTS -->
+  <div class="agents">
+    <div class="agents-head"><span class="n">05</span><h3>Texture agents</h3></div>
+    <p class="agents-sub"><b>Stabilizers</b> bind water and tame ice crystals; <b>emulsifiers</b> disperse fat and pull in air. The trick: strong emulsifiers act as <b>destabilizers</b> — they partially coalesce the fat, which is what gives soft serve its dry, stand-up-peak texture. Chips show where each one typically shows up.</p>
+
+    <div class="cat">Stabilizers &amp; thickeners — bind water, control ice, add body</div>
+    <div class="agrid">
+      <div class="agent"><p class="name">Xanthan gum</p><p class="role">Cold-soluble; a tiny dose builds big viscosity. Common in no-churn bases.</p><div class="chips"><span class="chip ic-on">IC</span><span class="chip ss-on">SS</span><span class="chip fy-on">FY</span></div></div>
+      <div class="agent"><p class="name">Locust bean gum</p><p class="role">Carob-derived; needs heat to hydrate. Creamy body; pairs with carrageenan.</p><div class="chips"><span class="chip ic-on">IC</span><span class="chip ss-on">SS</span><span class="chip">FY</span></div></div>
+      <div class="agent"><p class="name">Guar gum</p><p class="role">Cold-soluble workhorse; teams up with xanthan and locust bean gum.</p><div class="chips"><span class="chip ic-on">IC</span><span class="chip ss-on">SS</span><span class="chip fy-on">FY</span></div></div>
+      <div class="agent"><p class="name">Carrageenan</p><p class="role">Secondary stabilizer; stops dairy from separating ("wheying off").</p><div class="chips"><span class="chip ic-on">IC</span><span class="chip ss-on">SS</span><span class="chip">FY</span></div></div>
+      <div class="agent"><p class="name">Gelatin</p><p class="role">Old-school ice cream setter; animal-derived; silky, clean melt.</p><div class="chips"><span class="chip ic-on">IC</span><span class="chip">SS</span><span class="chip">FY</span></div></div>
+      <div class="agent"><p class="name">Tapioca starch</p><p class="role">Adds chew and body; a favorite in no-churn and scoopable froyo.</p><div class="chips"><span class="chip ic-on">IC</span><span class="chip">SS</span><span class="chip fy-on">FY</span></div></div>
+      <div class="agent"><p class="name">Cornstarch</p><p class="role">Sicilian-style thickener; gives clean, custardy body without egg.</p><div class="chips"><span class="chip ic-on">IC</span><span class="chip">SS</span><span class="chip">FY</span></div></div>
+      <div class="agent"><p class="name">Pectin</p><p class="role">Acid-tolerant, so it shines in tangy froyo and fruit sorbets.</p><div class="chips"><span class="chip">IC</span><span class="chip">SS</span><span class="chip fy-on">FY</span></div></div>
+      <div class="agent"><p class="name">Milk powder (MSNF)</p><p class="role">Nonfat milk solids: protein + water-binding. Builds body and holds air.</p><div class="chips"><span class="chip ic-on">IC</span><span class="chip ss-on">SS</span><span class="chip fy-on">FY</span></div></div>
+      <div class="agent"><p class="name">Cream cheese</p><p class="role">Fat + protein + tang in one — smooths and bodies (the Jeni's move).</p><div class="chips"><span class="chip ic-on">IC</span><span class="chip">SS</span><span class="chip fy-on">FY</span></div></div>
+      <div class="agent"><p class="name">Commercial stabilizer blend</p><p class="role">Pre-mixed gums dialed for consistent results at production scale.</p><div class="chips"><span class="chip ic-on">IC</span><span class="chip ss-on">SS</span><span class="chip fy-on">FY</span></div></div>
+    </div>
+
+    <div class="cat">Emulsifiers &amp; destabilizers — disperse fat, pull in air, build dryness</div>
+    <div class="agrid">
+      <div class="agent"><p class="name">Mono- &amp; diglyceride flakes</p><p class="role">The commercial emulsifier. Drives fat destabilization → dry, stiff texture and better overrun.</p><div class="chips"><span class="chip ic-on">IC</span><span class="chip ss-on">SS</span><span class="chip">FY</span></div></div>
+      <div class="agent"><p class="name">Polysorbate 80</p><p class="role">Strong fat destabilizer — the classic reason soft serve holds a stand-up peak.</p><div class="chips"><span class="chip ic-on">IC</span><span class="chip ss-on">SS</span><span class="chip">FY</span></div></div>
+      <div class="agent"><p class="name">Lecithin</p><p class="role">Natural emulsifier (soy or egg); smooths fat and helps whip in air.</p><div class="chips"><span class="chip ic-on">IC</span><span class="chip ss-on">SS</span><span class="chip fy-on">FY</span></div></div>
+      <div class="agent"><p class="name">Egg yolk</p><p class="role">Natural lecithin source; the French / custard style — rich and very smooth.</p><div class="chips"><span class="chip ic-on">IC</span><span class="chip">SS</span><span class="chip">FY</span></div></div>
+    </div>
+
+    <div class="legend">
+      <span class="key"><b>Columns</b></span>
+      <span class="key"><span class="kdot" style="background:var(--ic)"></span> IC — ice cream</span>
+      <span class="key"><span class="kdot" style="background:var(--ss)"></span> SS — soft serve</span>
+      <span class="key"><span class="kdot" style="background:var(--fy)"></span> FY — frozen yogurt</span>
+      <span class="key" style="margin-left:auto"><b>Bars</b> = relative level within a component, not an exact number</span>
+    </div>
+
+    <p class="foot">Percentages are typical formulation ranges, not fixed recipes — exact figures vary by brand, region, and legal standards (in the US, "ice cream" must be ≥10% milkfat). Component levels are shown relative to each other to make the trade-offs readable at a glance.</p>
+  </div>
+
+</div>
+</body>
+</html>
