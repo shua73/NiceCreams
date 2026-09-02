@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soft serve machines — visual buyer's guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBFAF7; --char:#3B3B3D; --char2:#4C4C4E; --gray:#8A8A8A; --line:#E4E0D9;
+    --orange:#C8752F; --orange-d:#AE5F1E;
+    --warm:#FBF1E0; --warm-l:#EDD9AE; --cool:#ECEAE4; --cool-l:#D6D2CA;
+    --cheap:#3E7D4E; --cheap-bg:#E4F0E5;
+    --mod:#A9782A; --mod-bg:#FBF0DA;
+    --prem:#A5432E; --prem-bg:#F6E3DE;
+    --teal:#3E8E9C; --brick:#A5432E;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:#D8D5CF; font-family:"Oswald",sans-serif; -webkit-font-smoothing:antialiased;}
+  .poster{max-width:700px; margin:22px auto; background:var(--cream); overflow:hidden; box-shadow:0 6px 30px rgba(0,0,0,.14);}
+
+  /* header */
+  .head{text-align:center; padding:28px 22px 4px}
+  .kicker{font-size:12px; letter-spacing:.2em; color:var(--orange); font-weight:600; margin:0 0 6px}
+  .title{font-family:"Anton",sans-serif; font-size:clamp(34px,7.4vw,58px); line-height:.9; margin:0; color:var(--char)}
+  .title em{font-style:normal; color:var(--orange)}
+  .subhead{display:flex; align-items:center; justify-content:center; gap:12px; margin:11px 0 0}
+  .subhead::before,.subhead::after{content:""; height:2px; width:40px; background:var(--char)}
+  .subhead span{font-size:11px; letter-spacing:.09em; color:var(--char); font-weight:500}
+
+  /* price anchor band */
+  .anchor{background:var(--char); padding:22px; margin-top:20px}
+  .anchor-t{font-family:"Anton"; font-size:14px; letter-spacing:.03em; text-transform:uppercase; color:#fff; text-align:center; margin:0 0 3px}
+  .anchor-s{font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:#B9B6B1; text-align:center; margin:0 0 16px}
+  .prices{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+  .pc{background:var(--char2); border-radius:12px; padding:15px 12px; text-align:center}
+  .pc .big{font-family:"Anton"; font-size:32px; line-height:.85; color:var(--orange)}
+  .pc .big .u{font-size:16px; vertical-align:top}
+  .pc .lab{font-size:11px; color:#fff; text-transform:uppercase; letter-spacing:.03em; margin:8px 0 2px; font-weight:600}
+  .pc .sub{font-size:9.5px; color:#B9B6B1; text-transform:uppercase; letter-spacing:.02em; line-height:1.3; margin:0}
+  .anchor-f{font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; color:#94918C; text-align:center; margin:14px 0 0}
+
+  /* section heads */
+  .sec-t{font-family:"Anton"; font-size:20px; text-transform:uppercase; color:var(--char); text-align:center; margin:26px 22px 2px; letter-spacing:.02em}
+  .sec-t em{font-style:normal; color:var(--orange)}
+  .sec-s{font-size:11px; color:var(--gray); text-transform:uppercase; letter-spacing:.05em; text-align:center; margin:0 22px 16px}
+
+  /* axis card */
+  .axis{margin:0 22px 16px; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:#fff}
+  .axis-head{display:flex; align-items:center; gap:11px; padding:12px 16px; border-bottom:1px solid var(--line)}
+  .axis-head .badge{font-family:"Anton"; font-size:15px; color:#fff; background:var(--orange); width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex:none}
+  .axis-head h3{font-family:"Anton"; font-size:17px; text-transform:uppercase; color:var(--char); margin:0; line-height:1}
+  .axis-head p{font-size:10.5px; color:var(--gray); text-transform:uppercase; letter-spacing:.02em; margin:2px 0 0}
+  .opts{display:grid; grid-template-columns:1fr 1fr; position:relative}
+  .opt{padding:16px 15px}
+  .opt.a{background:var(--warm)} .opt.b{background:var(--cool)}
+  .opt .oi{width:56px; height:56px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; margin-bottom:10px; border:2px solid}
+  .opt.a .oi{border-color:var(--warm-l)} .opt.b .oi{border-color:var(--cool-l)}
+  .opt h4{font-family:"Anton"; font-size:15px; text-transform:uppercase; color:var(--char); margin:0 0 7px; line-height:1.02}
+  .chip{display:inline-block; font-size:10px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; padding:3px 9px; border-radius:20px; margin-bottom:9px}
+  .c-cheap{background:var(--cheap-bg); color:var(--cheap)}
+  .c-mod{background:var(--mod-bg); color:var(--mod)}
+  .c-prem{background:var(--prem-bg); color:var(--prem)}
+  .opt .wt{font-size:11px; color:#5c5c5c; text-transform:uppercase; letter-spacing:.02em; line-height:1.45; margin:0 0 8px}
+  .opt .bf{font-size:10.5px; color:var(--gray); text-transform:uppercase; letter-spacing:.02em; line-height:1.4; margin:0}
+  .opt .bf b{color:var(--char); font-weight:600}
+  .vs{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-family:"Anton"; font-size:13px; color:#fff; background:var(--char); width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; z-index:2}
+  .axis-foot{padding:12px 16px; background:var(--cream); border-top:1px solid var(--line); font-size:11px; color:#5c5c5c; text-transform:uppercase; letter-spacing:.02em; line-height:1.5}
+  .axis-foot b{color:var(--char); font-weight:600}
+  .axis-foot .tag{font-family:"Anton"; font-size:11px; letter-spacing:.06em; color:var(--orange); margin-right:7px}
+  /* overrun mini scale */
+  .ovr{display:flex; gap:16px; padding:0 16px 13px; background:var(--cream)}
+  .ovr .o1{flex:1}
+  .ovr .olab{font-size:9.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--gray); margin:0 0 4px}
+  .ovr .olab b{color:var(--char)}
+  .ovr .otrack{height:11px; background:#EDE9E2; border-radius:6px; overflow:hidden}
+  .ovr .ofill{height:100%; border-radius:6px}
+
+  /* upgrades */
+  .upgrade{margin:0 22px 16px; border:1px solid var(--line); border-radius:14px; background:#fff; overflow:hidden}
+  .up-head{display:flex; align-items:center; gap:13px; padding:15px 16px}
+  .up-head .ui{width:52px; height:52px; border-radius:12px; background:var(--warm); display:flex; align-items:center; justify-content:center; flex:none; border:1px solid var(--warm-l)}
+  .up-head .tagline{font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--orange); font-weight:600; margin:0 0 2px}
+  .up-head h3{font-family:"Anton"; font-size:20px; text-transform:uppercase; color:var(--char); margin:0; line-height:1}
+  .up-body{display:grid; grid-template-columns:1fr 210px; gap:0}
+  .up-main{padding:2px 16px 16px}
+  .up-main .r{font-size:11px; color:#5c5c5c; text-transform:uppercase; letter-spacing:.02em; line-height:1.5; margin:0 0 8px}
+  .up-main .r b{color:var(--char); font-weight:600}
+  .up-main .r .l{font-family:"Anton"; font-size:10px; letter-spacing:.05em; color:var(--orange); display:block; margin-bottom:1px}
+  .roi{background:var(--char); padding:16px; display:flex; flex-direction:column; justify-content:center}
+  .roi .big{font-family:"Anton"; font-size:30px; line-height:.85; color:var(--orange)}
+  .roi .big .u{font-size:15px; vertical-align:top}
+  .roi .bl{font-size:10px; color:#D6D3CE; text-transform:uppercase; letter-spacing:.02em; line-height:1.35; margin:6px 0 12px}
+  .roi ul{margin:0; padding:0; list-style:none}
+  .roi li{font-size:10px; color:#C9C7C3; text-transform:uppercase; letter-spacing:.02em; line-height:1.3; padding:6px 0; border-top:1px solid #55555a; display:flex; justify-content:space-between; gap:8px}
+  .roi li b{color:#fff; font-weight:600; font-family:"Oswald"; white-space:nowrap}
+
+  /* quick read */
+  .quick{background:#F1EDE6; padding:22px; margin-top:24px}
+  .quick-t{font-family:"Anton"; font-size:17px; text-transform:uppercase; text-align:center; color:var(--char); margin:0 0 16px; letter-spacing:.02em}
+  .qgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+  .qc{background:#fff; border-radius:12px; padding:16px 14px; text-align:center}
+  .qc .qi{width:48px; height:48px; margin:0 auto 10px; border-radius:50%; background:var(--warm); display:flex; align-items:center; justify-content:center; border:2px solid var(--warm-l)}
+  .qc .qh{font-family:"Anton"; font-size:13px; text-transform:uppercase; color:var(--orange); margin:0 0 6px; line-height:1.05}
+  .qc p{font-size:10.5px; color:#5c5c5c; text-transform:uppercase; letter-spacing:.02em; line-height:1.45; margin:0}
+  .qc p b{color:var(--char); font-weight:600}
+
+  .foot{padding:16px 22px 24px; font-size:10px; color:var(--gray); text-transform:uppercase; letter-spacing:.03em; line-height:1.55; text-align:center}
+
+  @media (max-width:560px){
+    .prices,.qgrid{grid-template-columns:1fr}
+    .opts{grid-template-columns:1fr}
+    .opt.a{border-bottom:1px solid var(--warm-l)}
+    .vs{display:none}
+    .up-body{grid-template-columns:1fr}
+    .ovr{flex-direction:column; gap:10px}
+  }
+</style>
+</head>
+<body>
+<div class="poster">
+
+  <!-- HEADER -->
+  <div class="head">
+    <p class="kicker">COMMERCIAL EQUIPMENT GUIDE</p>
+    <h1 class="title">SOFT SERVE <em>MACHINES</em></h1>
+    <div class="subhead"><span>THE OPTIONS THAT MOVE THE PRICE — AND WHAT THEY EARN BACK</span></div>
+  </div>
+
+  <!-- PRICE ANCHOR -->
+  <div class="anchor">
+    <p class="anchor-t">Base machine, before options</p>
+    <p class="anchor-s">new · name-brand · the options below stack on top</p>
+    <div class="prices">
+      <div class="pc"><div class="big">$2–8<span class="u">K</span></div><p class="lab">Entry countertop</p><p class="sub">Low volume · dessert add-on</p></div>
+      <div class="pc"><div class="big">$8–18<span class="u">K</span></div><p class="lab">Mid / twin-twist</p><p class="sub">Restaurants · mid-volume shops</p></div>
+      <div class="pc"><div class="big">$18–35<span class="u">K</span></div><p class="lab">High-volume floor</p><p class="sub">Dedicated shops · all day</p></div>
+    </div>
+    <p class="anchor-f">Used runs ~40–70% less · premium brands (Taylor, Carpigiani) sit at the top of each band</p>
+  </div>
+
+  <!-- DECISIONS -->
+  <p class="sec-t">Four decisions that <em>move the price</em></p>
+  <p class="sec-s">each one shifts cost — and pays back differently</p>
+
+  <!-- 01 FEED -->
+  <div class="axis">
+    <div class="axis-head"><span class="badge">1</span><div><h3>Feed system</h3><p>How the mix — and the air — gets into the cylinder</p></div></div>
+    <div class="opts">
+      <div class="opt a">
+        <div class="oi"><svg width="30" height="30" viewBox="0 0 30 30"><path d="M4 5h22L18 16v6h-6v-6z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/><line x1="15" y1="22" x2="15" y2="28" stroke="#C8752F" stroke-width="2"/><path d="M11 25l4 4 4-4" fill="none" stroke="#C8752F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h4>Gravity-fed</h4>
+        <span class="chip c-cheap">Lower cost</span>
+        <p class="wt">Top hopper, gravity feeds it down. Fixed ~40–45% air → denser, richer serve. Fewer parts.</p>
+        <p class="bf"><b>Best for:</b> craft product, froyo by weight, low-maintenance shops</p>
+      </div>
+      <div class="opt b">
+        <div class="oi"><svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="16" r="9" fill="none" stroke="#C8752F" stroke-width="2"/><path d="M15 21v-9M12 15l3-3 3 3" fill="none" stroke="#C8752F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 8a6 6 0 0 1 8-2M24 8a6 6 0 0 0-8-2" fill="none" stroke="#C8752F" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <h4>Pump / pressurized</h4>
+        <span class="chip c-mod">+ moderate · est. $2–5K</span>
+        <p class="wt">A pump pushes mix + air in. Overrun adjustable ~25–100% → lighter, silkier, faster, more consistent.</p>
+        <p class="bf"><b>Best for:</b> high volume, max yield per gallon</p>
+      </div>
+      <div class="vs">VS</div>
+    </div>
+    <div class="ovr">
+      <div class="o1"><p class="olab"><b>Gravity overrun</b> · 40–45%</p><div class="otrack"><div class="ofill" style="width:43%;background:var(--orange)"></div></div></div>
+      <div class="o1"><p class="olab"><b>Pump overrun</b> · 25–100%</p><div class="otrack"><div class="ofill" style="width:100%;background:var(--orange)"></div></div></div>
+    </div>
+    <div class="axis-foot"><span class="tag">BOTTOM LINE</span> Pump makes <b>more product from the same mix</b> — 65% overrun turns 1 gal into 1.65 gal → better margin at volume. Gravity is denser (weighs more if you sell by weight) and cheaper to buy &amp; clean.</div>
+  </div>
+
+  <!-- 02 COOLING -->
+  <div class="axis">
+    <div class="axis-head"><span class="badge">2</span><div><h3>Cooling</h3><p>How the machine sheds the heat it makes</p></div></div>
+    <div class="opts">
+      <div class="opt a">
+        <div class="oi"><svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="3" fill="#C8752F"/><g fill="none" stroke="#C8752F" stroke-width="2" stroke-linecap="round"><path d="M15 12c-1-5 2-8 5-7s0 6-5 7"/><path d="M15 18c1 5-2 8-5 7s0-6 5-7"/><path d="M12 15c-5 1-8-2-7-5s6 0 7 5"/><path d="M18 15c5-1 8 2 7 5s-6 0-7-5"/></g></svg></div>
+        <h4>Air-cooled</h4>
+        <span class="chip c-cheap">Lower install</span>
+        <p class="wt">Fan across the condenser. Needs ~6" clearance + AC. No plumbing — place it anywhere.</p>
+        <p class="bf"><b>Best for:</b> single machines, food trucks, flexible placement</p>
+      </div>
+      <div class="opt b">
+        <div class="oi"><svg width="26" height="30" viewBox="0 0 26 30"><path d="M13 3C9 11 3 15 3 21a10 10 0 0 0 20 0c0-6-6-10-10-18z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/><path d="M8 20a5 5 0 0 0 3 5" fill="none" stroke="#C8752F" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h4>Water-cooled</h4>
+        <span class="chip c-mod">+ plumbing · est. $0.5–2K</span>
+        <p class="wt">Water line cools the condenser. Quiet, no clearance, holds up in hot/tight rooms.</p>
+        <p class="bf"><b>Best for:</b> high volume, multiple machines, warm spaces</p>
+      </div>
+      <div class="vs">VS</div>
+    </div>
+    <div class="axis-foot"><span class="tag">BOTTOM LINE</span> Air-cooled <b>dumps heat into the room</b> — raising your AC bill, especially with several machines. Water-cooled runs cool &amp; quiet under load; add a <b>glycol chiller</b> to recycle the water.</div>
+  </div>
+
+  <!-- 03 FORMAT -->
+  <div class="axis">
+    <div class="axis-head"><span class="badge">3</span><div><h3>Format</h3><p>Footprint traded against capacity</p></div></div>
+    <div class="opts">
+      <div class="opt a">
+        <div class="oi"><svg width="34" height="30" viewBox="0 0 34 30"><rect x="10" y="4" width="14" height="18" rx="2" fill="none" stroke="#C8752F" stroke-width="2"/><path d="M17 22v3" stroke="#C8752F" stroke-width="2"/><line x1="3" y1="26" x2="31" y2="26" stroke="#C8752F" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h4>Countertop</h4>
+        <span class="chip c-cheap">Entry point</span>
+        <p class="wt">Compact, smaller hopper, ~2–3 servings/min. Sits on a counter, easy for any staff.</p>
+        <p class="bf"><b>Best for:</b> restaurants adding dessert, tight space, moderate volume</p>
+      </div>
+      <div class="opt b">
+        <div class="oi"><svg width="26" height="34" viewBox="0 0 26 34"><rect x="7" y="2" width="12" height="26" rx="2" fill="none" stroke="#C8752F" stroke-width="2"/><path d="M13 28v2" stroke="#C8752F" stroke-width="2"/><rect x="10" y="9" width="6" height="4" fill="#C8752F"/><line x1="2" y1="31" x2="24" y2="31" stroke="#C8752F" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h4>Floor model</h4>
+        <span class="chip c-prem">+ premium · est. $8–20K</span>
+        <p class="wt">Big hopper (20–40 qt), bigger compressor, built for continuous all-day output.</p>
+        <p class="bf"><b>Best for:</b> dedicated shops, high traffic, long lines</p>
+      </div>
+      <div class="vs">VS</div>
+    </div>
+    <div class="axis-foot"><span class="tag">BOTTOM LINE</span> Match to throughput: a countertop <b>bottlenecks a busy line</b>; a floor model is expensive dead weight for a few cones an hour. This is the <b>biggest single line-item</b> here.</div>
+  </div>
+
+  <!-- 04 FLAVOR -->
+  <div class="axis">
+    <div class="axis-head"><span class="badge">4</span><div><h3>Flavor configuration</h3><p>How many sellable products from one unit</p></div></div>
+    <div class="opts">
+      <div class="opt a">
+        <div class="oi"><svg width="26" height="32" viewBox="0 0 26 32"><path d="M13 12c5 0 8-4 8-4s-2 6-8 6-8-6-8-6 3 4 8 4z" fill="#C8752F"/><path d="M6 14h14l-7 16z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/></svg></div>
+        <h4>Single flavor</h4>
+        <span class="chip c-cheap">Simplest build</span>
+        <p class="wt">One cylinder, one flavor. Least to buy, run, and clean.</p>
+        <p class="bf"><b>Best for:</b> one signature flavor, tight budget/space</p>
+      </div>
+      <div class="opt b">
+        <div class="oi"><svg width="30" height="32" viewBox="0 0 30 32"><path d="M15 11c3 0 5-2 6-3-1 3-3 5-6 5s-5-2-6-5c1 1 3 3 6 3z" fill="#3E8E9C"/><path d="M15 7c3 0 5-2 6-3-1 3-3 5-6 5s-5-2-6-5c1 1 3 3 6 3z" fill="#A5432E"/><path d="M8 13h14l-7 17z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/></svg></div>
+        <h4>Twin twist</h4>
+        <span class="chip c-mod">+ moderate · est. $3–8K</span>
+        <p class="wt">Two flavors + a swirl of both = <b>3 products from one machine</b>, no extra floor space.</p>
+        <p class="bf"><b>Best for:</b> most mid-volume shops — the twist outsells either single</p>
+      </div>
+      <div class="vs">VS</div>
+    </div>
+    <div class="axis-foot"><span class="tag">BOTTOM LINE</span> Twin twist <b>triples the menu at zero added footprint</b> — the default sweet spot. Go single only when space, budget, or a one-flavor concept demands it.</div>
+  </div>
+
+  <!-- UPGRADES -->
+  <p class="sec-t">Upgrades that <em>layer on</em></p>
+  <p class="sec-s">not either/or — bolt them onto any build</p>
+
+  <!-- HEAT TREATMENT -->
+  <div class="upgrade">
+    <div class="up-head">
+      <div class="ui"><svg width="26" height="28" viewBox="0 0 26 28"><path d="M13 2l9 4v7c0 6-4 10-9 13-5-3-9-7-9-13V6z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/><path d="M9 13l3 3 5-6" fill="none" stroke="#C8752F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div><p class="tagline">Upgrade · cleaning tech</p><h3>Heat treatment</h3></div>
+    </div>
+    <div class="up-body">
+      <div class="up-main">
+        <p class="r"><span class="l">WHAT IT IS</span>An automated nightly pasteurizing cycle keeps the mix safe, so you fully tear down and deep-clean only <b>every 28 days</b> instead of every night.</p>
+        <p class="r"><span class="l">PRICE IMPACT</span><b>+ premium — est. $5–12K</b> over a standard model (roughly +30–50%). More complex machine.</p>
+        <p class="r"><span class="l">TRADE-OFF</span>You're pre-paying for labor savings — the math rewards <b>steady daily volume</b>. No throughput penalty.</p>
+      </div>
+      <div class="roi">
+        <div class="big">$75–150</div>
+        <p class="bl">saved / machine / month in nightly cleaning labor (at $15/hr)</p>
+        <ul>
+          <li>Nightly teardown <b>gone</b></li>
+          <li>Deep cleans / yr <b>~13 vs 365</b></li>
+          <li>Best when <b>staffing is thin</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLAVOR BURST -->
+  <div class="upgrade">
+    <div class="up-head">
+      <div class="ui"><svg width="28" height="30" viewBox="0 0 28 30"><path d="M9 3h10v6l-2 3h-6l-2-3z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/><circle cx="9" cy="20" r="3" fill="#3E8E9C"/><circle cx="14" cy="24" r="3" fill="#C8752F"/><circle cx="19" cy="20" r="3" fill="#A5432E"/></svg></div>
+      <div><p class="tagline">Add-on · flavor injection</p><h3>Flavor Burst</h3></div>
+    </div>
+    <div class="up-body">
+      <div class="up-main">
+        <p class="r"><span class="l">WHAT IT IS</span>Bolts onto your existing spout and injects syrup <b>into and through</b> the serve — up to 8 flavors (255+ combos) from one vanilla cylinder, via a touchscreen. No new freezer, no footprint.</p>
+        <p class="r"><span class="l">PRICE IMPACT</span>Add-on, quote-based — commonly <b>~$8–12K new</b>. Syrup adds only about <b>$0.03 / serving</b>.</p>
+        <p class="r"><span class="l">TRADE-OFF</span>Vendor lift claims are optimistic — results ride on <b>foot traffic + upsell discipline</b>. Adds a daily rinse and monthly strip-down.</p>
+      </div>
+      <div class="roi">
+        <div class="big">+$0.75–1.50</div>
+        <p class="bl">upcharge / flavored serving on a ~$0.03 cost</p>
+        <ul>
+          <li>Claimed sales lift <b>100–300%</b></li>
+          <li>Worked examples <b>+$14–22K/yr</b></li>
+          <li>Payback (busy) <b>&lt; 6 mo</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK READ -->
+  <div class="quick">
+    <p class="quick-t">Quick read, by concept</p>
+    <div class="qgrid">
+      <div class="qc">
+        <div class="qi"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M13 3v20M5 23h16" stroke="#C8752F" stroke-width="2" stroke-linecap="round"/><path d="M13 6l-7 3 3 5a4 4 0 0 0 8 0l-4-8z" fill="none" stroke="#C8752F" stroke-width="1.6" stroke-linejoin="round"/><path d="M13 6l7 3-3 5a4 4 0 0 1-8 0" fill="none" stroke="#C8752F" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+        <p class="qh">Craft / by-weight</p>
+        <p><b>Gravity-fed</b>, countertop or twin — denser serve weighs more, cleans up simple</p>
+      </div>
+      <div class="qc">
+        <div class="qi"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M4 10l3-6h12l3 6" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/><rect x="4" y="10" width="18" height="12" fill="none" stroke="#C8752F" stroke-width="2"/><rect x="10" y="15" width="6" height="7" fill="#C8752F"/></svg></div>
+        <p class="qh">High-volume shop</p>
+        <p><b>Pump + floor + twin</b>, water-cooled, heat treatment if late-night cleaning is a risk</p>
+      </div>
+      <div class="qc">
+        <div class="qi"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M13 3L4 12l9 10 9-10z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/><circle cx="10" cy="10" r="2.4" fill="#3E8E9C"/><circle cx="15" cy="12" r="2.4" fill="#A5432E"/></svg></div>
+        <p class="qh">Variety on a budget</p>
+        <p>Keep the base simple, bolt on <b>Flavor Burst</b> — many flavors, one cylinder</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">Prices are ballpark &amp; quote-based (Sept 2026), varying by brand, region &amp; new-vs-used. Figures marked "est." are directional, not vendor quotes — confirm with a distributor. ROI figures come from industry/vendor sources and assume you drive the upsell &amp; run at steady volume.</p>
+
+</div>
+</body>
+</html>
