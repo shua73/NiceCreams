@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soft serve options — bang for buck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBFAF7; --char:#3B3B3D; --char2:#4C4C4E; --gray:#8A8A8A; --line:#E4E0D9;
+    --orange:#C8752F; --orange-d:#AE5F1E;
+    --teal:#3E8E9C; --brick:#A5432E;
+    --green:#3E7D4E; --green-bg:#E4F0E5;
+    --gold:#D2A038; --silver:#A7A099; --bronze:#B07A4A;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:#D8D5CF; font-family:"Oswald",sans-serif; -webkit-font-smoothing:antialiased;}
+  .poster{max-width:700px; margin:22px auto; background:var(--cream); overflow:hidden; box-shadow:0 6px 30px rgba(0,0,0,.14);}
+
+  /* header */
+  .head{text-align:center; padding:28px 22px 4px}
+  .kicker{font-size:12px; letter-spacing:.2em; color:var(--orange); font-weight:600; margin:0 0 6px}
+  .title{font-family:"Anton"; font-size:clamp(38px,9vw,66px); line-height:.9; margin:0; color:var(--char)}
+  .title em{font-style:normal; color:var(--orange)}
+  .subhead{display:flex; align-items:center; justify-content:center; gap:12px; margin:11px 0 0}
+  .subhead::before,.subhead::after{content:""; height:2px; width:40px; background:var(--char)}
+  .subhead span{font-size:11px; letter-spacing:.08em; color:var(--char); font-weight:500}
+
+  .sec-t{font-family:"Anton"; font-size:19px; text-transform:uppercase; color:var(--char); text-align:center; margin:26px 22px 2px; letter-spacing:.02em}
+  .sec-t em{font-style:normal; color:var(--orange)}
+  .sec-s{font-size:11px; color:var(--gray); text-transform:uppercase; letter-spacing:.05em; text-align:center; margin:0 22px 14px}
+
+  /* value map */
+  .maprow{padding:0 22px}
+  .axtop{font-family:"Anton"; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--gray); text-align:center; margin:0 0 6px}
+  .map{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .quad{border-radius:12px; padding:14px; border:1px solid var(--line); background:#fff}
+  .quad.win{background:var(--green-bg); border-color:#CBE3CD}
+  .quad.bet{background:#FBF1E0; border-color:#EDD9AE}
+  .quad.ins{background:#EEF3F4; border-color:#CFE0E2}
+  .quad.need{background:#EDEAE4; border-color:#DAD5CC}
+  .quad .qh{display:flex; align-items:center; gap:7px; margin:0 0 3px}
+  .quad .qn{font-family:"Anton"; font-size:14px; text-transform:uppercase; line-height:1}
+  .quad.win .qn{color:var(--green)} .quad.bet .qn{color:var(--orange-d)}
+  .quad.ins .qn{color:var(--teal)} .quad.need .qn{color:var(--char)}
+  .quad .qd{font-size:9.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--gray); margin:0 0 10px}
+  .quad .opt{display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.75); border-radius:8px; padding:6px 9px; margin-top:6px}
+  .quad.win .opt,.quad.bet .opt,.quad.ins .opt,.quad.need .opt{background:#fff}
+  .opt .oi{flex:none}
+  .opt .on{font-family:"Anton"; font-size:11.5px; text-transform:uppercase; color:var(--char); line-height:1}
+  .opt .oc{font-size:9.5px; color:var(--gray); margin-left:auto; white-space:nowrap; font-weight:600}
+  .best-star{font-size:11px; color:var(--gold)}
+  .axbot{display:flex; justify-content:space-between; font-family:"Anton"; font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--gray); margin:8px 2px 0}
+
+  /* leaderboard */
+  .board{padding:0 22px}
+  .lrow{display:grid; grid-template-columns:40px 46px 1fr 118px; gap:12px; align-items:center; padding:14px 0; border-top:1px solid var(--line)}
+  .lrow:first-child{border-top:0}
+  .rank{width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:"Anton"; font-size:16px; color:#fff}
+  .r1{background:var(--gold)} .r2{background:var(--silver)} .r3{background:var(--bronze)}
+  .rn{background:var(--char)}
+  .licon{width:46px; height:46px; border-radius:10px; background:#F1EDE6; display:flex; align-items:center; justify-content:center}
+  .lmain .lt{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 3px}
+  .lmain .ln{font-family:"Anton"; font-size:15px; text-transform:uppercase; color:var(--char); line-height:1}
+  .lmain .cost{font-size:9.5px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; color:var(--orange-d); background:#FBF0DA; padding:2px 7px; border-radius:20px}
+  .lmain .lp{font-size:10.5px; color:#5c5c5c; text-transform:uppercase; letter-spacing:.02em; line-height:1.4; margin:0}
+  .lmain .lp b{color:var(--char); font-weight:600}
+  .lmeter{text-align:right}
+  .stars{font-size:0; line-height:0; margin:0 0 4px; white-space:nowrap}
+  .stars i{display:inline-block; width:12px; height:12px; border-radius:50%; margin-left:3px; background:#E0DBD2}
+  .stars i.on{background:var(--orange)}
+  .metlab{font-family:"Anton"; font-size:8.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--gray); margin:0 0 4px}
+  .pay{font-size:9px; text-transform:uppercase; letter-spacing:.02em; color:#fff; background:var(--char2); padding:2px 7px; border-radius:20px; display:inline-block}
+  .pay.fast{background:var(--green)} .pay.mid{background:var(--orange)} .pay.slow{background:var(--brick)}
+
+  /* flips */
+  .flips{background:var(--char); padding:22px; margin-top:24px}
+  .flips-t{font-family:"Anton"; font-size:16px; text-transform:uppercase; text-align:center; color:#fff; margin:0 0 3px; letter-spacing:.02em}
+  .flips-s{font-size:10.5px; color:#B9B6B1; text-transform:uppercase; letter-spacing:.05em; text-align:center; margin:0 0 16px}
+  .fgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+  .fc{background:var(--char2); border-radius:12px; padding:15px 13px; text-align:center}
+  .fc .fh{font-size:10px; text-transform:uppercase; letter-spacing:.03em; color:#B9B6B1; line-height:1.35; margin:0 0 9px}
+  .fc .fh b{color:#fff; font-weight:600}
+  .fc .fr{font-family:"Anton"; font-size:12.5px; text-transform:uppercase; color:var(--orange); line-height:1.1; margin:0}
+
+  .foot{padding:16px 22px 24px; font-size:10px; color:var(--gray); text-transform:uppercase; letter-spacing:.03em; line-height:1.55; text-align:center}
+
+  @media (max-width:560px){
+    .map{grid-template-columns:1fr}
+    .lrow{grid-template-columns:34px 40px 1fr; gap:10px}
+    .lmeter{grid-column:2 / -1; text-align:left; margin-top:2px}
+    .stars{margin-left:0}
+    .fgrid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="poster">
+
+  <!-- HEADER -->
+  <div class="head">
+    <p class="kicker">SOFT SERVE UPGRADES · RANKED</p>
+    <h1 class="title">BANG FOR <em>BUCK</em></h1>
+    <div class="subhead"><span>WHICH OPTIONS EARN THEIR KEEP — FOR A TYPICAL SMALL SHOP</span></div>
+  </div>
+
+  <!-- VALUE MAP -->
+  <p class="sec-t">The value map</p>
+  <p class="sec-s">return per dollar · where each option lands</p>
+  <div class="maprow">
+    <p class="axtop">↑ higher return / impact</p>
+    <div class="map">
+      <!-- quick wins -->
+      <div class="quad win">
+        <div class="qh"><span class="qn">Quick wins</span><span class="best-star">★</span></div>
+        <p class="qd">Low cost · high return</p>
+        <div class="opt"><span class="oi"><svg width="24" height="24" viewBox="0 0 30 30"><path d="M15 11c3 0 5-2 6-3-1 3-3 5-6 5s-5-2-6-5c1 1 3 3 6 3z" fill="#3E8E9C"/><path d="M15 7c3 0 5-2 6-3-1 3-3 5-6 5s-5-2-6-5c1 1 3 3 6 3z" fill="#A5432E"/><path d="M8 13h14l-7 15z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/></svg></span><span class="on">Twin twist</span><span class="oc">+$3–8K</span></div>
+        <div class="opt"><span class="oi"><svg width="24" height="24" viewBox="0 0 30 30"><circle cx="15" cy="16" r="9" fill="none" stroke="#C8752F" stroke-width="2"/><path d="M15 21v-9M12 15l3-3 3 3" fill="none" stroke="#C8752F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="on">Pump feed</span><span class="oc">+$2–5K</span></div>
+      </div>
+      <!-- big bets -->
+      <div class="quad bet">
+        <div class="qh"><span class="qn">Big bets</span></div>
+        <p class="qd">High cost · high (but conditional) return</p>
+        <div class="opt"><span class="oi"><svg width="24" height="24" viewBox="0 0 28 30"><path d="M9 3h10v6l-2 3h-6l-2-3z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/><circle cx="9" cy="20" r="3" fill="#3E8E9C"/><circle cx="14" cy="24" r="3" fill="#C8752F"/><circle cx="19" cy="20" r="3" fill="#A5432E"/></svg></span><span class="on">Flavor Burst</span><span class="oc">+$8–12K</span></div>
+        <div class="opt"><span class="oi"><svg width="22" height="24" viewBox="0 0 26 34"><rect x="7" y="2" width="12" height="26" rx="2" fill="none" stroke="#C8752F" stroke-width="2"/><rect x="10" y="9" width="6" height="4" fill="#C8752F"/><line x1="2" y1="31" x2="24" y2="31" stroke="#C8752F" stroke-width="2" stroke-linecap="round"/></svg></span><span class="on">Floor model</span><span class="oc">+$8–20K</span></div>
+      </div>
+      <!-- cheap insurance -->
+      <div class="quad ins">
+        <div class="qh"><span class="qn">Cheap insurance</span></div>
+        <p class="qd">Low cost · situational return</p>
+        <div class="opt"><span class="oi"><svg width="20" height="24" viewBox="0 0 26 30"><path d="M13 3C9 11 3 15 3 21a10 10 0 0 0 20 0c0-6-6-10-10-18z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/></svg></span><span class="on">Water-cooled</span><span class="oc">+$0.5–2K</span></div>
+      </div>
+      <!-- only when needed -->
+      <div class="quad need">
+        <div class="qh"><span class="qn">Only when needed</span></div>
+        <p class="qd">Mid–high cost · situational return</p>
+        <div class="opt"><span class="oi"><svg width="22" height="24" viewBox="0 0 26 28"><path d="M13 2l9 4v7c0 6-4 10-9 13-5-3-9-7-9-13V6z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/><path d="M9 13l3 3 5-6" fill="none" stroke="#C8752F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="on">Heat treatment</span><span class="oc">+$5–12K</span></div>
+      </div>
+    </div>
+    <div class="axbot"><span>← lower cost</span><span>higher cost →</span></div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <p class="sec-t">The ranking</p>
+  <p class="sec-s">scored on return per dollar · ● = value rating</p>
+  <div class="board">
+
+    <div class="lrow">
+      <div class="rank r1">1</div>
+      <div class="licon"><svg width="30" height="30" viewBox="0 0 30 32"><path d="M15 11c3 0 5-2 6-3-1 3-3 5-6 5s-5-2-6-5c1 1 3 3 6 3z" fill="#3E8E9C"/><path d="M15 7c3 0 5-2 6-3-1 3-3 5-6 5s-5-2-6-5c1 1 3 3 6 3z" fill="#A5432E"/><path d="M8 13h14l-7 17z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/></svg></div>
+      <div class="lmain">
+        <div class="lt"><span class="ln">Twin twist</span><span class="cost">+$3–8K</span></div>
+        <p class="lp"><b>Triples the menu</b> — 3 products from one machine, and the twist usually outsells either single. Cheap, near-universal.</p>
+      </div>
+      <div class="lmeter"><p class="metlab">Value</p><div class="stars"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div><span class="pay fast">Fast payback</span></div>
+    </div>
+
+    <div class="lrow">
+      <div class="rank r2">2</div>
+      <div class="licon"><svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="16" r="9" fill="none" stroke="#C8752F" stroke-width="2"/><path d="M15 21v-9M12 15l3-3 3 3" fill="none" stroke="#C8752F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 8a6 6 0 0 1 8-2M24 8a6 6 0 0 0-8-2" fill="none" stroke="#C8752F" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+      <div class="lmain">
+        <div class="lt"><span class="ln">Pump feed</span><span class="cost">+$2–5K</span></div>
+        <p class="lp"><b>~20% more servings per gallon</b> of mix at volume, from higher overrun. Cheap, direct margin gain.</p>
+      </div>
+      <div class="lmeter"><p class="metlab">Value</p><div class="stars"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div><span class="pay fast">Fast at volume</span></div>
+    </div>
+
+    <div class="lrow">
+      <div class="rank r3">3</div>
+      <div class="licon"><svg width="30" height="30" viewBox="0 0 28 30"><path d="M9 3h10v6l-2 3h-6l-2-3z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/><circle cx="9" cy="20" r="3" fill="#3E8E9C"/><circle cx="14" cy="24" r="3" fill="#C8752F"/><circle cx="19" cy="20" r="3" fill="#A5432E"/></svg></div>
+      <div class="lmain">
+        <div class="lt"><span class="ln">Flavor Burst</span><span class="cost">+$8–12K</span></div>
+        <p class="lp"><b>Biggest upside</b> — 8 flavors from one cylinder, $0.75–1.50 upcharge on ~$0.03 cost; vendors cite +$14–22K/yr. Needs traffic.</p>
+      </div>
+      <div class="lmeter"><p class="metlab">Value</p><div class="stars"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div><span class="pay mid">&lt;6 mo if busy</span></div>
+    </div>
+
+    <div class="lrow">
+      <div class="rank rn">4</div>
+      <div class="licon"><svg width="26" height="30" viewBox="0 0 26 30"><path d="M13 3C9 11 3 15 3 21a10 10 0 0 0 20 0c0-6-6-10-10-18z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/><path d="M8 20a5 5 0 0 0 3 5" fill="none" stroke="#C8752F" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div class="lmain">
+        <div class="lt"><span class="ln">Water-cooled</span><span class="cost">+$0.5–2K</span></div>
+        <p class="lp">Cheap, but the payoff is indirect — <b>quieter, cooler, trims AC load</b>. Real edge only in hot/tight rooms or multi-machine setups.</p>
+      </div>
+      <div class="lmeter"><p class="metlab">Value</p><div class="stars"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div><span class="pay">Indirect</span></div>
+    </div>
+
+    <div class="lrow">
+      <div class="rank rn">5</div>
+      <div class="licon"><svg width="28" height="30" viewBox="0 0 26 28"><path d="M13 2l9 4v7c0 6-4 10-9 13-5-3-9-7-9-13V6z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/><path d="M9 13l3 3 5-6" fill="none" stroke="#C8752F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="lmain">
+        <div class="lt"><span class="ln">Heat treatment</span><span class="cost">+$5–12K</span></div>
+        <p class="lp">Saves <b>~$75–150/mo/machine</b> in cleaning labor — but that's a multi-year payback on price alone unless staffing or health-dept compliance is a real pain.</p>
+      </div>
+      <div class="lmeter"><p class="metlab">Value</p><div class="stars"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div><span class="pay slow">Slow · situational</span></div>
+    </div>
+
+    <div class="lrow">
+      <div class="rank rn">6</div>
+      <div class="licon"><svg width="26" height="30" viewBox="0 0 26 34"><rect x="7" y="2" width="12" height="26" rx="2" fill="none" stroke="#C8752F" stroke-width="2"/><path d="M13 28v2" stroke="#C8752F" stroke-width="2"/><rect x="10" y="9" width="6" height="4" fill="#C8752F"/><line x1="2" y1="31" x2="24" y2="31" stroke="#C8752F" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="lmain">
+        <div class="lt"><span class="ln">Floor model</span><span class="cost">+$8–20K</span></div>
+        <p class="lp">The priciest line-item. <b>Unlocks all-day capacity</b> — but it only pays back if you'd otherwise be turning customers away.</p>
+      </div>
+      <div class="lmeter"><p class="metlab">Value</p><div class="stars"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div><span class="pay slow">Only if maxed out</span></div>
+    </div>
+  </div>
+
+  <!-- FLIPS -->
+  <div class="flips">
+    <p class="flips-t">When the ranking flips</p>
+    <p class="flips-s">bang for buck depends on your situation</p>
+    <div class="fgrid">
+      <div class="fc"><p class="fh">If you're <b>turning customers away</b> at peak…</p><p class="fr">Floor model → #1</p></div>
+      <div class="fc"><p class="fh">If <b>late-night staffing is thin</b> or health rules are strict…</p><p class="fr">Heat treatment rises</p></div>
+      <div class="fc"><p class="fh">If <b>foot traffic is low</b>…</p><p class="fr">Skip Flavor Burst<br>until you're busy</p></div>
+    </div>
+  </div>
+
+  <p class="foot">Ranking is for a typical small / independent shop and is directional, not a quote. Costs are ballpark (Sept 2026) and vary by brand, region &amp; new-vs-used; ROI figures come from industry / vendor sources and assume you actually drive the upsell &amp; run at steady volume.</p>
+
+</div>
+</body>
+</html>
