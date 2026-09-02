@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soft serve vs frozen yogurt vs Greek froyo — visual guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBFAF7; --char:#3B3B3D; --char2:#4C4C4E; --gray:#8A8A8A; --line:#E4E0D9;
+    --ss:#3E8E9C;   /* soft serve — teal */
+    --fy:#C8752F;   /* frozen yogurt — orange */
+    --gfy:#A5432E;  /* greek froyo — brick */
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:#D8D5CF; font-family:"Oswald",sans-serif; -webkit-font-smoothing:antialiased;}
+  .poster{max-width:680px; margin:22px auto; background:var(--cream); overflow:hidden; box-shadow:0 6px 30px rgba(0,0,0,.14);}
+
+  /* header */
+  .head{text-align:center; padding:28px 22px 4px}
+  .kicker{font-size:12px; letter-spacing:.22em; color:var(--fy); font-weight:600; margin:0 0 6px}
+  .title{font-family:"Anton",sans-serif; font-size:clamp(34px,7.6vw,58px); line-height:.92; letter-spacing:.01em; margin:0; color:var(--char)}
+  .title em{font-style:normal; color:var(--fy)}
+  .subhead{display:flex; align-items:center; justify-content:center; gap:12px; margin:10px 0 0}
+  .subhead::before,.subhead::after{content:""; height:2px; width:40px; background:var(--char)}
+  .subhead span{font-size:11.5px; letter-spacing:.1em; color:var(--char); font-weight:500}
+
+  /* legend */
+  .legend{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:20px 22px 6px}
+  .lg{display:flex; gap:11px; align-items:center; padding:11px 12px; border-radius:10px; background:#fff; border:1px solid var(--line)}
+  .lg .ic{flex:none}
+  .lg .lt .nm{font-family:"Anton",sans-serif; font-size:15px; text-transform:uppercase; line-height:1; margin:0}
+  .lg .lt .ds{font-size:10.5px; color:var(--gray); text-transform:uppercase; letter-spacing:.03em; line-height:1.25; margin:3px 0 0}
+  .lg.ss .nm{color:var(--ss)} .lg.fy .nm{color:var(--fy)} .lg.gfy .nm{color:var(--gfy)}
+
+  /* hero big numbers */
+  .hero{display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin:18px 0 0; background:var(--char)}
+  .hcell{padding:20px 16px; text-align:center; border-right:1px solid #55555a}
+  .hcell:last-child{border-right:0}
+  .hcell .big{font-family:"Anton",sans-serif; font-size:46px; line-height:.85; color:var(--fy)}
+  .hcell .big .u{font-size:20px; vertical-align:top}
+  .hcell .cap{font-size:11px; color:#D6D3CE; text-transform:uppercase; letter-spacing:.03em; line-height:1.35; margin:8px 0 0}
+  .hcell .cap b{color:#fff; font-weight:600}
+
+  /* components */
+  .sec-t{font-family:"Anton",sans-serif; font-size:20px; text-transform:uppercase; color:var(--char); text-align:center; margin:26px 0 2px; letter-spacing:.02em}
+  .sec-s{font-size:11.5px; color:var(--gray); text-transform:uppercase; letter-spacing:.05em; text-align:center; margin:0 0 16px}
+  .comp{padding:0 22px}
+  .block{display:grid; grid-template-columns:64px 1fr; gap:14px; align-items:center; padding:15px 0; border-top:1px solid var(--line)}
+  .block:first-child{border-top:0}
+  .bic{width:64px; height:64px; border-radius:12px; background:#F1EDE6; display:flex; align-items:center; justify-content:center}
+  .bname{font-family:"Anton",sans-serif; font-size:17px; text-transform:uppercase; color:var(--char); line-height:1; margin:0 0 2px}
+  .bsub{font-size:10.5px; color:var(--gray); text-transform:uppercase; letter-spacing:.03em; margin:0 0 9px; line-height:1.3}
+  .bars{display:flex; flex-direction:column; gap:6px}
+  .bar{display:grid; grid-template-columns:34px 1fr auto; gap:9px; align-items:center}
+  .bar .bl{font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.03em}
+  .bar.ss .bl{color:var(--ss)} .bar.fy .bl{color:var(--fy)} .bar.gfy .bl{color:var(--gfy)}
+  .track{height:14px; background:#EDE9E2; border-radius:7px; overflow:hidden}
+  .fill{height:100%; border-radius:7px}
+  .bar.ss .fill{background:var(--ss)} .bar.fy .fill{background:var(--fy)} .bar.gfy .fill{background:var(--gfy)}
+  .bv{font-family:"Oswald"; font-size:11.5px; font-weight:600; color:var(--char); white-space:nowrap; min-width:60px; text-align:right}
+
+  /* process */
+  .proc{background:#F1EDE6; margin-top:24px; padding:20px 22px}
+  .proc-t{font-family:"Anton",sans-serif; font-size:15px; text-transform:uppercase; text-align:center; color:var(--char); margin:0 0 14px; letter-spacing:.03em}
+  .steps{display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap}
+  .step{display:flex; flex-direction:column; align-items:center; gap:6px; width:96px; text-align:center}
+  .step .sic{width:52px; height:52px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; border:2px solid var(--fy)}
+  .step .snm{font-family:"Anton",sans-serif; font-size:12px; text-transform:uppercase; color:var(--char); line-height:1}
+  .step .sd{font-size:9.5px; color:var(--gray); text-transform:uppercase; letter-spacing:.02em; line-height:1.25}
+  .arw{color:var(--fy); font-size:22px; font-weight:700; padding-bottom:20px}
+
+  /* packability verdict */
+  .verdict{background:var(--char); padding:22px}
+  .verdict-t{font-family:"Anton",sans-serif; font-size:18px; text-transform:uppercase; text-align:center; color:#fff; margin:0 0 4px; letter-spacing:.02em}
+  .verdict-s{font-size:11px; color:#B9B6B1; text-transform:uppercase; letter-spacing:.05em; text-align:center; margin:0 0 18px}
+  .vgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+  .vc{background:var(--char2); border-radius:12px; padding:16px 14px; text-align:center; border-top:4px solid}
+  .vc.ss{border-color:var(--ss)} .vc.fy{border-color:var(--fy)} .vc.gfy{border-color:var(--gfy)}
+  .vc .vp{font-family:"Anton",sans-serif; font-size:13px; text-transform:uppercase; margin:0 0 8px}
+  .vc.ss .vp{color:#7FC3CE} .vc.fy .vp{color:#E4A66A} .vc.gfy .vp{color:#D98A78}
+  .vc .mark{width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 10px; font-size:22px; font-weight:700}
+  .vc .badge{font-family:"Anton",sans-serif; font-size:15px; text-transform:uppercase; color:#fff; margin:0 0 8px; line-height:1}
+  .vc .vt{font-size:10.5px; color:#CFCCC7; text-transform:uppercase; letter-spacing:.02em; line-height:1.45; margin:0}
+  .vc .vt b{color:#fff; font-weight:600}
+
+  .foot{padding:16px 22px 24px; font-size:10.5px; color:var(--gray); text-transform:uppercase; letter-spacing:.03em; line-height:1.55; text-align:center}
+
+  @media (max-width:560px){
+    .legend{grid-template-columns:1fr}
+    .hero{grid-template-columns:1fr}
+    .hcell{border-right:0; border-bottom:1px solid #55555a}
+    .vgrid{grid-template-columns:1fr}
+    .steps{flex-direction:column}
+    .arw{transform:rotate(90deg); padding:0}
+    .step{width:auto}
+  }
+</style>
+</head>
+<body>
+<div class="poster">
+
+  <!-- HEADER -->
+  <div class="head">
+    <p class="kicker">THE LIGHTER, CULTURED COUSINS</p>
+    <h1 class="title">SOFT SERVE <em>vs</em> FROYO <em>vs</em> GREEK</h1>
+    <div class="subhead"><span>SAME LIGHT LANE — CULTURING &amp; STRAINING DO THE WORK</span></div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="lg ss">
+      <span class="ic"><svg width="34" height="40" viewBox="0 0 34 40"><path d="M17 15c6 0 9-4 9-4s-2 6-9 6-9-6-9-6 3 4 9 4z" fill="#3E8E9C"/><path d="M17 8c5 0 8-3 8-3s-2 5-8 5-8-5-8-5 3 3 8 3z" fill="#3E8E9C"/><path d="M9 18h16l-8 20z" fill="#C79A6A"/></svg></span>
+      <div class="lt"><p class="nm">Soft serve</p><p class="ds">Not cultured · whipped light</p></div>
+    </div>
+    <div class="lg fy">
+      <span class="ic"><svg width="34" height="40" viewBox="0 0 34 40"><path d="M8 16h18l-2 20H10z" fill="#C8752F"/><path d="M17 14c5 0 8-4 8-4s-2 5-8 5-8-5-8-5 3 4 8 4z" fill="#E4A66A"/></svg></span>
+      <div class="lt"><p class="nm">Frozen yogurt</p><p class="ds">Cultured · tangy</p></div>
+    </div>
+    <div class="lg gfy">
+      <span class="ic"><svg width="34" height="40" viewBox="0 0 34 40"><path d="M7 15h20l-2 21H9z" fill="#A5432E"/><path d="M17 13c6 0 9-4 9-4s-2 6-9 6-9-6-9-6 3 4 9 4z" fill="#D98A78"/><text x="17" y="30" font-family="Anton" font-size="11" fill="#fff" text-anchor="middle">2×</text></svg></span>
+      <div class="lt"><p class="nm">Greek froyo</p><p class="ds">Strained · dense · high protein</p></div>
+    </div>
+  </div>
+
+  <!-- HERO BIG NUMBERS -->
+  <div class="hero">
+    <div class="hcell">
+      <div class="big">2<span class="u">×</span></div>
+      <p class="cap">the <b>protein</b> in Greek froyo vs regular — straining removes the whey</p>
+    </div>
+    <div class="hcell">
+      <div class="big">0–6<span class="u">%</span></div>
+      <p class="cap">the <b>fat</b> across all three — this is the light lane, no matter which</p>
+    </div>
+    <div class="hcell">
+      <div class="big">60<span class="u">%</span></div>
+      <p class="cap">the <b>air</b> whipped into soft serve at the high end — Greek is the densest</p>
+    </div>
+  </div>
+
+  <!-- COMPONENTS -->
+  <p class="sec-t">The five core components</p>
+  <p class="sec-s">bar length = relative level · SS = soft serve · FY = froyo · GFY = greek</p>
+  <div class="comp">
+
+    <!-- ICE -->
+    <div class="block">
+      <div class="bic"><svg width="36" height="36" viewBox="0 0 36 36"><g stroke="#3E8E9C" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="4" x2="18" y2="32"/><line x1="4" y1="18" x2="32" y2="18"/><line x1="8" y1="8" x2="28" y2="28"/><line x1="28" y1="8" x2="8" y2="28"/></g></svg></div>
+      <div>
+        <p class="bname">Ice</p><p class="bsub">Water frozen into crystals — the enemy of smoothness</p>
+        <div class="bars">
+          <div class="bar ss"><span class="bl">SS</span><div class="track"><div class="fill" style="width:33%"></div></div><span class="bv">LOW</span></div>
+          <div class="bar fy"><span class="bl">FY</span><div class="track"><div class="fill" style="width:66%"></div></div><span class="bv">MED</span></div>
+          <div class="bar gfy"><span class="bl">GFY</span><div class="track"><div class="fill" style="width:50%"></div></div><span class="bv">LOW–MED</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROTEIN -->
+    <div class="block">
+      <div class="bic"><svg width="40" height="30" viewBox="0 0 40 30"><g fill="#C8752F"><rect x="2" y="11" width="5" height="8" rx="1"/><rect x="7" y="7" width="4" height="16" rx="1"/><rect x="29" y="7" width="4" height="16" rx="1"/><rect x="33" y="11" width="5" height="8" rx="1"/><rect x="11" y="13" width="18" height="4"/></g></svg></div>
+      <div>
+        <p class="bname">Protein</p><p class="bsub">Milk &amp; yogurt solids — build body without fat</p>
+        <div class="bars">
+          <div class="bar ss"><span class="bl">SS</span><div class="track"><div class="fill" style="width:35%"></div></div><span class="bv">MILK SOLIDS</span></div>
+          <div class="bar fy"><span class="bl">FY</span><div class="track"><div class="fill" style="width:45%"></div></div><span class="bv">~4–5%</span></div>
+          <div class="bar gfy"><span class="bl">GFY</span><div class="track"><div class="fill" style="width:82%"></div></div><span class="bv">~6–10%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAT -->
+    <div class="block">
+      <div class="bic"><svg width="30" height="38" viewBox="0 0 30 38"><path d="M15 3C10 12 3 18 3 26a12 12 0 0 0 24 0c0-8-7-14-12-23z" fill="#C8752F"/><path d="M9 24a6 6 0 0 0 3 6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div>
+        <p class="bname">Fat</p><p class="bsub">Low across the board — protein carries the mouthfeel</p>
+        <div class="bars">
+          <div class="bar ss"><span class="bl">SS</span><div class="track"><div class="fill" style="width:70%"></div></div><span class="bv">~3–6%</span></div>
+          <div class="bar fy"><span class="bl">FY</span><div class="track"><div class="fill" style="width:50%"></div></div><span class="bv">~0–6%</span></div>
+          <div class="bar gfy"><span class="bl">GFY</span><div class="track"><div class="fill" style="width:42%"></div></div><span class="bv">~0–5%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUGAR -->
+    <div class="block">
+      <div class="bic"><svg width="36" height="34" viewBox="0 0 36 34"><g fill="#C8752F"><rect x="6" y="12" width="12" height="12" rx="1.5" transform="skewX(-12)"/><rect x="19" y="8" width="12" height="12" rx="1.5" transform="skewX(-12)"/></g></svg></div>
+      <div>
+        <p class="bname">Sugar</p><p class="bsub">Sweetens + softens the freeze · offsets the tang</p>
+        <div class="bars">
+          <div class="bar ss"><span class="bl">SS</span><div class="track"><div class="fill" style="width:70%"></div></div><span class="bv">~13–15%</span></div>
+          <div class="bar fy"><span class="bl">FY</span><div class="track"><div class="fill" style="width:88%"></div></div><span class="bv">~15–20%</span></div>
+          <div class="bar gfy"><span class="bl">GFY</span><div class="track"><div class="fill" style="width:88%"></div></div><span class="bv">~15–20%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AIR -->
+    <div class="block">
+      <div class="bic"><svg width="40" height="30" viewBox="0 0 40 30"><path d="M11 24a7 7 0 0 1 0-14 9 9 0 0 1 17-2 6 6 0 0 1 2 16z" fill="#C8752F"/></svg></div>
+      <div>
+        <p class="bname">Air <span style="font-size:10px;color:var(--gray)">(overrun)</span></p><p class="bsub">Whipped-in volume · lower = denser &amp; creamier</p>
+        <div class="bars">
+          <div class="bar ss"><span class="bl">SS</span><div class="track"><div class="fill" style="width:80%"></div></div><span class="bv">~35–60%</span></div>
+          <div class="bar fy"><span class="bl">FY</span><div class="track"><div class="fill" style="width:67%"></div></div><span class="bv">~30–50%</span></div>
+          <div class="bar gfy"><span class="bl">GFY</span><div class="track"><div class="fill" style="width:50%"></div></div><span class="bv">~20–40%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROCESS -->
+  <div class="proc">
+    <p class="proc-t">How it's made</p>
+    <div class="steps">
+      <div class="step">
+        <div class="sic"><svg width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="11" fill="none" stroke="#C8752F" stroke-width="2"/><circle cx="9" cy="10" r="1.6" fill="#C8752F"/><circle cx="16" cy="9" r="1.6" fill="#C8752F"/><circle cx="13" cy="16" r="1.6" fill="#C8752F"/><circle cx="18" cy="15" r="1.6" fill="#C8752F"/></svg></div>
+        <span class="snm">Culture</span><span class="sd">FY &amp; GFY · SS skips this</span>
+      </div>
+      <span class="arw">→</span>
+      <div class="step">
+        <div class="sic"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M4 5h18l-6 8v8l-6-3v-5z" fill="none" stroke="#C8752F" stroke-width="2" stroke-linejoin="round"/><line x1="13" y1="21" x2="13" y2="25" stroke="#C8752F" stroke-width="2"/></svg></div>
+        <span class="snm">Strain</span><span class="sd">Greek only · removes whey</span>
+      </div>
+      <span class="arw">→</span>
+      <div class="step">
+        <div class="sic"><svg width="26" height="26" viewBox="0 0 26 26"><g stroke="#C8752F" stroke-width="2" stroke-linecap="round"><line x1="13" y1="3" x2="13" y2="23"/><line x1="5" y1="7" x2="21" y2="19"/><line x1="21" y1="7" x2="5" y2="19"/></g></svg></div>
+        <span class="snm">Freeze</span><span class="sd">Soft-serve machine or batch</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PACKABILITY VERDICT -->
+  <div class="verdict">
+    <p class="verdict-t">Can you sell it in a pint?</p>
+    <p class="verdict-s">the ranking flips — density wins in the freezer aisle</p>
+    <div class="vgrid">
+      <div class="vc ss">
+        <p class="vp">Soft serve</p>
+        <div class="mark" style="background:#5a3f3f;color:#F0A9A0">✕</div>
+        <p class="badge">Not as-is</p>
+        <p class="vt">Freeze it hard and it loses its texture — you'd <b>reformulate toward low-fat ice cream</b></p>
+      </div>
+      <div class="vc fy">
+        <p class="vp">Frozen yogurt</p>
+        <div class="mark" style="background:#5a4a35;color:#E4B77A">~</div>
+        <p class="badge">With tweaks</p>
+        <p class="vt">Add <b>sugar, solids &amp; stabilizer</b> to stay scoopable — the live cultures fade in the freezer</p>
+      </div>
+      <div class="vc gfy">
+        <p class="vp">Greek froyo</p>
+        <div class="mark" style="background:#3f5540;color:#9FD1A2">✓</div>
+        <p class="badge">Best suited</p>
+        <p class="vt">High protein <b>binds water &amp; resists ice</b> — the most pint-friendly of the three</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">Percentages are typical formulation ranges, not fixed recipes — they vary by brand, region &amp; the yogurt used. Bars show relative level to make the trade-offs readable at a glance.</p>
+
+</div>
+</body>
+</html>
