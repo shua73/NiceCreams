@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nice Creams — Interactive Growth Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1E3A32; --ink-soft:#42574f; --muted:#728178;
+    --paper:#F7F3E8; --panel:#FFFDF6;
+    --pistachio:#6BA292; --pistachio-deep:#3F7A69;
+    --amber:#E0A92E; --amber-deep:#C08815;
+    --brick:#B4463B; --brick-soft:#c96b60;
+    --line:rgba(30,58,50,.14); --line-strong:rgba(30,58,50,.28);
+    --display:'Fraunces',Georgia,serif;
+    --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:
+      radial-gradient(1200px 500px at 88% -8%, rgba(224,169,46,.10), transparent 60%),
+      radial-gradient(900px 500px at 3% 108%, rgba(107,162,146,.14), transparent 55%),
+      var(--paper);
+    color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;
+    padding:26px 22px 34px;
+  }
+  .wrap{max-width:1600px;margin:0 auto;background:var(--panel);
+    border:1px solid var(--line);border-radius:22px;overflow:hidden;
+    box-shadow:0 30px 80px -50px rgba(30,58,50,.55);}
+
+  /* header */
+  .mast{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;
+    padding:24px 34px;background:linear-gradient(180deg,#22463B,#1E3A32);color:#F4EFE1;}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand h1{font-family:var(--display);font-weight:600;font-size:30px;margin:0;letter-spacing:-.4px;color:#FBF5E6}
+  .brand p{margin:3px 0 0;font-size:13px;color:#B9C9C0}
+  .live{display:flex;gap:26px;text-align:right}
+  .live .k{font-size:12px;color:#AFC2B8}
+  .live .v{font-family:var(--display);font-weight:600;font-size:30px;line-height:1;color:var(--amber);letter-spacing:-.5px}
+  .live .v.alt{color:#F4EFE1}
+  .swirl{width:46px;height:60px;flex:0 0 auto}
+
+  /* body layout */
+  .grid{display:grid;grid-template-columns:370px 1fr;gap:0}
+  .controls{border-right:1px solid var(--line);padding:22px 22px 26px;background:linear-gradient(180deg,#FFFFFF,#FBF7EC);}
+  .results{padding:24px 30px 28px;min-width:0}
+
+  .cgroup{margin-bottom:20px}
+  .cgroup h3{font-family:var(--display);font-weight:600;font-size:15px;margin:0 0 12px;color:var(--ink);
+    display:flex;align-items:center;gap:8px}
+  .cgroup h3::before{content:"";width:16px;height:3px;border-radius:2px;background:var(--pistachio)}
+  .cgroup.grow h3::before{background:var(--amber)}
+
+  .slider{margin-bottom:13px}
+  .slider .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+  .slider .lbl{font-size:12.5px;color:var(--ink-soft)}
+  .slider .val{font-family:var(--display);font-weight:600;font-size:14px;color:var(--pistachio-deep);font-variant-numeric:tabular-nums}
+  .cgroup.grow .slider .val{color:var(--amber-deep)}
+
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:3px;
+    background:var(--line-strong);outline:none;cursor:pointer;margin:2px 0}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;
+    background:var(--amber);border:2px solid #fff;box-shadow:0 1px 4px rgba(30,58,50,.35);cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--amber);
+    border:2px solid #fff;box-shadow:0 1px 4px rgba(30,58,50,.35);cursor:pointer}
+  input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--pistachio-deep);outline-offset:2px}
+
+  /* schedule steppers */
+  .sched{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .step{text-align:center}
+  .step .yl{font-size:11px;color:var(--muted);margin-bottom:4px}
+  .step .box{display:flex;align-items:center;justify-content:center;gap:0;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fff}
+  .step button{border:0;background:transparent;width:22px;height:30px;font-size:15px;color:var(--pistachio-deep);cursor:pointer;font-weight:700}
+  .step button:hover{background:var(--paper)}
+  .step .n{font-family:var(--display);font-weight:600;font-size:15px;min-width:20px}
+  .schedcum{margin-top:8px;font-size:11.5px;color:var(--muted);text-align:center}
+  .schedcum b{color:var(--pistachio-deep)}
+
+  .resetbtn{margin-top:6px;width:100%;padding:9px;border:1px solid var(--line-strong);background:#fff;border-radius:10px;
+    font-family:var(--sans);font-size:12.5px;color:var(--ink-soft);cursor:pointer;font-weight:600}
+  .resetbtn:hover{background:var(--paper)}
+
+  /* results */
+  .rhead{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+  .rhead h2{font-family:var(--display);font-weight:600;font-size:20px;margin:0}
+  .rhead p{margin:0;color:var(--muted);font-size:12.5px}
+
+  .chartcard{border:1px solid var(--line);border-radius:16px;padding:14px 16px 10px;background:linear-gradient(180deg,#fff,#FCF9F0)}
+  svg.chart{width:100%;height:auto;display:block}
+  .yearrow{display:grid;grid-template-columns:repeat(5,1fr);margin-top:2px}
+  .yc{text-align:center;padding-top:8px;position:relative}
+  .yc::before{content:"";position:absolute;top:0;left:50%;width:1px;height:6px;background:var(--line-strong);transform:translateX(-.5px)}
+  .yc .yr{font-family:var(--display);font-weight:600;font-size:14px}
+  .yc .sh{font-size:11.5px;color:var(--muted)}
+  .yc .sh b{color:var(--pistachio-deep)}
+  .note{font-size:11.5px;color:var(--muted);margin:10px 2px 0;line-height:1.5}
+
+  /* KPI row */
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:18px 0 4px}
+  .kpi{border:1px solid var(--line);border-radius:13px;padding:13px 13px;background:#fff}
+  .kpi .v{font-family:var(--display);font-weight:600;font-size:22px;line-height:1;letter-spacing:-.4px;font-variant-numeric:tabular-nums}
+  .kpi .l{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.25}
+  .kpi.amber{background:linear-gradient(155deg,#F3CC63,#E0A92E);border-color:transparent}
+  .kpi.amber .v{color:#2a2007} .kpi.amber .l{color:#5a4713}
+  .kpi .v.neg{color:var(--brick)}
+
+  /* lower two-panel */
+  .lower{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;margin-top:20px}
+  .panel{border:1px solid var(--line);border-radius:16px;padding:18px 20px;background:#fff}
+  .panel h4{font-family:var(--display);font-weight:600;font-size:16px;margin:0 0 12px}
+
+  table.years{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  table.years th{font-size:11px;color:var(--muted);font-weight:600;text-align:right;padding:5px 6px;border-bottom:1px solid var(--line);text-transform:none}
+  table.years th:first-child{text-align:left}
+  table.years td{font-size:13px;padding:7px 6px;text-align:right;border-bottom:1px solid var(--line)}
+  table.years td:first-child{text-align:left;font-weight:600}
+  table.years tr:last-child td{border-bottom:0}
+  table.years .money{font-family:var(--display);font-weight:600}
+  table.years .neg{color:var(--brick)}
+
+  .econrow{display:flex;gap:10px;margin-bottom:14px}
+  .econbox{flex:1;border:1px solid var(--line);border-radius:11px;padding:11px 12px}
+  .econbox .t{font-size:11px;color:var(--muted);margin-bottom:5px}
+  .econbox .r{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin:3px 0}
+  .econbox .r b{font-family:var(--display);font-weight:600;font-size:15px}
+  .econbox.mature{background:linear-gradient(180deg,#F6FBF8,#EEF6F1);border-color:rgba(63,122,105,.3)}
+
+  .be{margin-top:4px}
+  .be .bar{height:16px;border-radius:8px;background:var(--paper);position:relative;margin:6px 0;overflow:hidden;border:1px solid var(--line)}
+  .be .fill{height:100%;border-radius:8px}
+  .be .row2{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-soft)}
+  .be .row2 b{font-family:var(--display)}
+
+  footer{padding:16px 34px 24px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);line-height:1.5;
+    display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  footer .site{color:var(--pistachio-deep);font-weight:600}
+
+  @media (max-width:1080px){
+    .grid{grid-template-columns:1fr}
+    .controls{border-right:0;border-bottom:1px solid var(--line)}
+    .kpis{grid-template-columns:repeat(3,1fr)}
+    .lower{grid-template-columns:1fr}
+    .live{flex-wrap:wrap}
+  }
+  @media print{ body{padding:0} .wrap{box-shadow:none;border:0;border-radius:0} @page{size:landscape} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="mast">
+    <div class="brand">
+      <svg class="swirl" viewBox="0 0 60 78" aria-hidden="true">
+        <polygon points="20,44 40,44 30,74" fill="#E7D9B4"/>
+        <ellipse cx="30" cy="40" rx="21" ry="10" fill="#FBF5E6"/>
+        <ellipse cx="30" cy="30" rx="16" ry="9" fill="#F6EDD6"/>
+        <ellipse cx="30" cy="21" rx="11" ry="7.5" fill="#FBF5E6"/>
+        <path d="M30 8 C24 8 24 16 30 15 C36 16 36 9 30 8 Z" fill="#F6EDD6"/>
+        <circle cx="30" cy="9" r="3.4" fill="#B4463B"/>
+      </svg>
+      <div>
+        <h1>Nice Creams</h1>
+        <p>Interactive five-year growth model — move a slider, the whole projection updates.</p>
+      </div>
+    </div>
+    <div class="live">
+      <div><div class="k">Year-5 revenue</div><div class="v" id="live-rev">$0.0M</div></div>
+      <div><div class="k">Run-rate EBITDA</div><div class="v alt" id="live-ebitda">$0K</div></div>
+      <div><div class="k">Gross on capital</div><div class="v" id="live-mult">0×</div></div>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- CONTROLS -->
+    <div class="controls">
+      <div class="cgroup" id="grp-product"><h3>One shop — product &amp; volume</h3></div>
+      <div class="cgroup" id="grp-costs"><h3>One shop — costs</h3></div>
+      <div class="cgroup grow" id="grp-growth"><h3>Growth &amp; exit</h3></div>
+
+      <div class="cgroup grow">
+        <h3>Openings per year</h3>
+        <div class="sched" id="sched"></div>
+        <div class="schedcum" id="schedcum"></div>
+      </div>
+
+      <button class="resetbtn" id="reset">Reset to your uploaded model</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="results">
+      <div class="rhead">
+        <h2>The ramp</h2>
+        <p>System revenue and shop count, years one through five.</p>
+      </div>
+
+      <div class="chartcard">
+        <svg class="chart" id="chart" viewBox="0 0 1000 380" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Revenue growth chart"></svg>
+        <div class="yearrow" id="yearrow"></div>
+      </div>
+      <p class="note" id="modelnote"></p>
+
+      <div class="kpis" id="kpis"></div>
+
+      <div class="lower">
+        <div class="panel">
+          <h4>Year-by-year P&amp;L</h4>
+          <table class="years" id="ytable">
+            <thead><tr><th>Year</th><th>Shops</th><th>Revenue</th><th>Net EBITDA</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h4>The engine behind one shop</h4>
+          <div class="econrow">
+            <div class="econbox">
+              <div class="t">Baseline shop (as entered)</div>
+              <div class="r"><span>Annual revenue</span><b id="e-brev">$0</b></div>
+              <div class="r"><span>Store EBITDA</span><b id="e-beb">$0</b></div>
+              <div class="r"><span>Build-out</span><b id="e-bbuild">$0</b></div>
+            </div>
+            <div class="econbox mature">
+              <div class="t">At maturity (breakfast + vendor)</div>
+              <div class="r"><span>Annual revenue</span><b id="e-mrev">$0</b></div>
+              <div class="r"><span>Store EBITDA</span><b id="e-meb">$0</b></div>
+              <div class="r"><span>Margin</span><b id="e-mmarg">0%</b></div>
+            </div>
+          </div>
+          <div class="be">
+            <div class="r" style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:2px">
+              <span style="color:var(--muted)">Contribution / serving</span><b style="font-family:var(--display)" id="e-contrib">$0</b>
+            </div>
+            <div class="bar"><div class="fill" id="be-plan" style="background:var(--pistachio)"></div></div>
+            <div class="row2"><span>Planned volume</span><b id="e-plan">0/day</b></div>
+            <div class="bar"><div class="fill" id="be-break" style="background:var(--brick-soft)"></div></div>
+            <div class="row2"><span>Break-even volume</span><b id="e-break">0/day</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div>Illustrative pro forma built from the Nice Creams unit model. Each new shop ramps toward the mature box
+      (opening-year and second-year volume set by the sliders); corporate G&amp;A and the exit multiple are yours to set.
+      Projections, not guarantees — not an offer of securities or investment advice.</div>
+    <div class="site">realnicecreams.com</div>
+  </footer>
+</div>
+
+<script>
+"use strict";
+const CFG = {
+  product:[
+    {key:'price',label:'Price / serving',min:5,max:15,step:.25,fmt:'money2'},
+    {key:'mixCup',label:'Mix + cup / serving',min:.75,max:4,step:.05,fmt:'money2'},
+    {key:'cardFee',label:'Card fee',min:0,max:5,step:.1,fmt:'pct'},
+    {key:'servingsDay',label:'Servings / day',min:60,max:400,step:5,fmt:'num'},
+    {key:'openDays',label:'Open days / month',min:20,max:31,step:1,fmt:'num'},
+  ],
+  costs:[
+    {key:'wage',label:'Loaded wage / hr',min:12,max:28,step:.25,fmt:'money2'},
+    {key:'staffedHrs',label:'Staffed hrs / day',min:10,max:70,step:1,fmt:'num'},
+    {key:'rent',label:'Rent + CAM / mo',min:2000,max:15000,step:250,fmt:'money'},
+    {key:'utilities',label:'Utilities / mo',min:500,max:5000,step:100,fmt:'money'},
+    {key:'other',label:'Other / mo',min:0,max:6000,step:100,fmt:'money'},
+    {key:'buildOut',label:'Build-out / shop',min:120000,max:450000,step:5000,fmt:'money'},
+  ],
+  growth:[
+    {key:'breakfastUplift',label:'Breakfast uplift (servings)',min:0,max:50,step:1,fmt:'pct'},
+    {key:'vendorCut',label:'Vendor COGS cut (mix+cup)',min:0,max:30,step:1,fmt:'pct'},
+    {key:'openingPct',label:'Opening-year volume',min:30,max:90,step:5,fmt:'pct'},
+    {key:'rampPct',label:'Second-year volume',min:60,max:100,step:5,fmt:'pct'},
+    {key:'corpGA',label:'Corporate G&A (of revenue)',min:0,max:12,step:.5,fmt:'pct'},
+    {key:'exitMultiple',label:'Exit multiple (× EBITDA)',min:4,max:12,step:.5,fmt:'x'},
+    {key:'retailRev',label:'Pints & Treats Y5 revenue',min:0,max:1500,step:50,fmt:'numk'},
+  ]
+};
+const DEF = {price:9.5,mixCup:2,cardFee:3,servingsDay:185,openDays:26,wage:18.5,staffedHrs:40,
+  rent:6000,utilities:2000,other:2000,buildOut:249000,breakfastUplift:20,vendorCut:10,
+  openingPct:55,rampPct:85,corpGA:6,exitMultiple:8,retailRev:500,schedule:[1,1,3,3,4]};
+
+let S = JSON.parse(JSON.stringify(DEF));
+
+/* ---------- formatting ---------- */
+const fmtVal = (v,f)=>{
+  if(f==='money2') return '$'+v.toFixed(2);
+  if(f==='money')  return '$'+Math.round(v).toLocaleString();
+  if(f==='pct')    return (Math.round(v*10)/10)+'%';
+  if(f==='num')    return Math.round(v).toLocaleString();
+  if(f==='numk')   return '$'+Math.round(v)+'K';
+  if(f==='x')      return v.toFixed(1)+'×';
+  return v;
+};
+function money(v){ // signed short money
+  const s=v<0?'−':''; const a=Math.abs(v);
+  if(a>=1e6) return s+'$'+(a/1e6).toFixed(a>=1e7?0:1)+'M';
+  if(a>=1e3) return s+'$'+Math.round(a/1e3)+'K';
+  return s+'$'+Math.round(a);
+}
+function millions(v){ return '$'+(v/1e6).toFixed(v/1e6>=10?0:1)+'M'; }
+
+/* ---------- model ---------- */
+function compute(){
+  const cardPct = S.cardFee/100;
+  // baseline shop (exactly as entered)
+  const baseServYr = S.servingsDay*S.openDays*12;
+  const baseRev = baseServYr*S.price;
+  const baseVarPer = S.mixCup + S.price*cardPct;
+  const baseVar = baseServYr*baseVarPer;
+  const baseLabor = S.wage*S.staffedHrs*S.openDays*12;
+  const baseOh = (S.rent+S.utilities+S.other)*12;
+  const baseEbitda = baseRev-baseVar-baseLabor-baseOh;
+  const contribPer = S.price-baseVarPer;
+  const fixedMo = S.wage*S.staffedHrs*S.openDays + (S.rent+S.utilities+S.other);
+  const beServDay = contribPer>0 ? fixedMo/(contribPer*S.openDays) : Infinity;
+
+  // mature shop
+  const up = S.breakfastUplift/100;
+  const matServYr = S.servingsDay*(1+up)*S.openDays*12;
+  const matMixCup = S.mixCup*(1-S.vendorCut/100);
+  const matRev = matServYr*S.price;
+  const matVar = matServYr*(matMixCup + S.price*cardPct);
+  const matLabor = S.wage*(S.staffedHrs*(1+up*0.5))*S.openDays*12;
+  const matOh = baseOh;
+  const matEbitda = matRev-matVar-matLabor-matOh;
+
+  const stage = f => {
+    const rev=matRev*f, varc=matVar*f, labor=matLabor*(0.5+0.5*f);
+    return {rev, ebitda: rev-varc-labor-matOh};
+  };
+  const fOpen=S.openingPct/100, fRamp=S.rampPct/100;
+  const fAge = a => a<=0?fOpen : a===1?fRamp : 1;
+
+  const adds=S.schedule; let cum=0; const years=[];
+  for(let y=1;y<=5;y++){
+    cum+=adds[y-1];
+    let rev=0,eb=0;
+    for(let k=1;k<=y;k++){ const n=adds[k-1]; if(!n)continue; const st=stage(fAge(y-k)); rev+=n*st.rev; eb+=n*st.ebitda; }
+    let retailRev=0,retailEb=0;
+    if(y===5 && S.retailRev>0){ retailRev=S.retailRev*1000; retailEb=retailRev*0.15; }
+    const ga=(S.corpGA/100)*rev;
+    years.push({y,shops:cum,rev:rev+retailRev,ebitda:eb-ga+retailEb});
+  }
+  const totalShops=cum;
+  const capital=totalShops*S.buildOut;
+  const rrShop=totalShops*matEbitda;
+  const rrGa=(S.corpGA/100)*(totalShops*matRev);
+  const rrRetail=S.retailRev>0?S.retailRev*1000*0.15:0;
+  const runRate=rrShop-rrGa+rrRetail;
+  const ev=runRate*S.exitMultiple;
+  const grossMult=capital>0?ev/capital:0;
+
+  return {years,totalShops,capital,runRate,ev,grossMult,
+    baseRev,baseEbitda,contribPer,beServDay,
+    matRev,matEbitda,matMargin:matRev>0?matEbitda/matRev:0};
+}
+
+/* ---------- chart ---------- */
+function niceMax(v){ const m=v/1e6*1.03; const steps=[.5,1,1.5,2,3,4,5,6,7,8,10,12,15,20,25,30];
+  for(const s of steps){ if(m<=s) return s*1e6; } return Math.ceil(m)*1e6; }
+
+function renderChart(R){
+  const revs=R.years.map(y=>y.rev);
+  const axisMax=niceMax(Math.max(...revs,1));
+  const X=[100,300,500,700,900], TOP=28, BOT=340, H=BOT-TOP;
+  const y=v=>BOT-(v/axisMax)*H;
+  let g='';
+  // gridlines
+  [0.25,0.5,0.75,1].forEach(t=>{
+    const gy=BOT-t*H, val=axisMax*t;
+    g+=`<line x1="100" y1="${gy.toFixed(1)}" x2="900" y2="${gy.toFixed(1)}" stroke="rgba(30,58,50,${t===0?.28:.1})" stroke-width="1"/>`;
+    g+=`<text x="88" y="${(gy+4).toFixed(1)}" text-anchor="end" font-family="Inter" font-size="11.5" fill="#9aa79f">$${(val/1e6).toFixed(1)}M</text>`;
+  });
+  g+=`<line x1="100" y1="${BOT}" x2="900" y2="${BOT}" stroke="rgba(30,58,50,.28)" stroke-width="1"/>`;
+  g+=`<text x="88" y="${BOT+4}" text-anchor="end" font-family="Inter" font-size="11.5" fill="#9aa79f">$0</text>`;
+  // area + line
+  const pts=X.map((x,i)=>[x,y(revs[i])]);
+  let area=`M100,${BOT} L${pts.map(p=>p[0]+','+p[1].toFixed(1)).join(' L')} L900,${BOT} Z`;
+  let line=`M${pts.map(p=>p[0]+','+p[1].toFixed(1)).join(' L')}`;
+  g+=`<path d="${area}" fill="url(#area)"/>`;
+  g+=`<path d="${line}" fill="none" stroke="url(#stroke)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  // points + labels
+  pts.forEach((p,i)=>{
+    const last=i===4;
+    g+=`<circle cx="${p[0]}" cy="${p[1].toFixed(1)}" r="${last?7:5}" fill="${last?'#E0A92E':'#3F7A69'}" ${last?'stroke="#C08815" stroke-width="2"':''}/>`;
+    g+=`<text x="${p[0]}" y="${(p[1]-13).toFixed(1)}" text-anchor="middle" font-family="Fraunces" font-weight="600" font-size="${last?16:13.5}" fill="#1E3A32">${millions(revs[i])}</text>`;
+  });
+  const defs=`<defs>
+    <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E0A92E" stop-opacity=".5"/>
+      <stop offset="0.55" stop-color="#6BA292" stop-opacity=".26"/>
+      <stop offset="1" stop-color="#6BA292" stop-opacity=".05"/></linearGradient>
+    <linearGradient id="stroke" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#3F7A69"/><stop offset="1" stop-color="#C08815"/></linearGradient></defs>`;
+  document.getElementById('chart').innerHTML=defs+g;
+
+  const locs=['Gaslight Village','Eastown','Riverfront · Rockford · Ada','Trend-market entries','Regional + Pints & Treats'];
+  document.getElementById('yearrow').innerHTML=R.years.map((yr,i)=>
+    `<div class="yc"><div class="yr">Year ${yr.y}</div><div class="sh"><b>${yr.shops}</b> shop${yr.shops!==1?'s':''}</div></div>`).join('');
+}
+
+/* ---------- KPIs / tables ---------- */
+function render(){
+  const R=compute();
+  renderChart(R);
+
+  const y5=R.years[4];
+  document.getElementById('live-rev').textContent=millions(y5.rev);
+  document.getElementById('live-ebitda').textContent=money(R.runRate);
+  document.getElementById('live-mult').textContent=R.grossMult.toFixed(1)+'×';
+
+  const kpi=[
+    {v:millions(y5.rev),l:'Year-5 system revenue'},
+    {v:money(y5.ebitda),l:'Year-5 net EBITDA',neg:y5.ebitda<0},
+    {v:money(R.runRate),l:'Mature run-rate EBITDA',neg:R.runRate<0},
+    {v:money(R.capital),l:'Capital deployed ('+R.totalShops+' build-outs)'},
+    {v:millions(R.ev),l:'Enterprise value at '+S.exitMultiple.toFixed(1)+'×',amber:true},
+    {v:R.grossMult.toFixed(1)+'×',l:'Gross on capital',amber:true},
+  ];
+  document.getElementById('kpis').innerHTML=kpi.map(k=>
+    `<div class="kpi ${k.amber?'amber':''}"><div class="v ${k.neg?'neg':''}">${k.v}</div><div class="l">${k.l}</div></div>`).join('');
+
+  document.querySelector('#ytable tbody').innerHTML=R.years.map(yr=>
+    `<tr><td>Year ${yr.y}</td><td>${yr.shops}</td><td class="money">${millions(yr.rev)}</td>
+     <td class="money ${yr.ebitda<0?'neg':''}">${money(yr.ebitda)}</td></tr>`).join('');
+
+  document.getElementById('e-brev').textContent=money(R.baseRev);
+  document.getElementById('e-beb').textContent=money(R.baseEbitda);
+  document.getElementById('e-bbuild').textContent=money(S.buildOut);
+  document.getElementById('e-mrev').textContent=money(R.matRev);
+  document.getElementById('e-meb').textContent=money(R.matEbitda);
+  document.getElementById('e-mmarg').textContent=(R.matMargin*100).toFixed(0)+'%';
+  document.getElementById('e-contrib').textContent='$'+R.contribPer.toFixed(2);
+
+  const be=isFinite(R.beServDay)?Math.round(R.beServDay):0;
+  const plan=Math.round(S.servingsDay);
+  const scaleMax=Math.max(plan,be,1)*1.15;
+  document.getElementById('e-plan').textContent=plan+'/day';
+  document.getElementById('e-break').textContent=(isFinite(R.beServDay)?be:'—')+'/day';
+  document.getElementById('be-plan').style.width=(plan/scaleMax*100)+'%';
+  document.getElementById('be-break').style.width=(isFinite(R.beServDay)?(be/scaleMax*100):0)+'%';
+  document.getElementById('be-break').style.background = be>plan ? 'var(--brick)' : 'var(--brick-soft)';
+
+  const c=S.corpGA>0?`${S.corpGA}% corporate G&A applied`:'store-level EBITDA (no corporate G&A)';
+  document.getElementById('modelnote').innerHTML=
+    `Each new shop opens at <b>${S.openingPct}%</b> of mature volume, reaches <b>${S.rampPct}%</b> in year two, then matures. `+
+    `Mature shop assumes a <b>${S.breakfastUplift}%</b> breakfast uplift and a <b>${S.vendorCut}%</b> vendor cut on mix + cup. Currently: ${c}.`;
+}
+
+/* ---------- build controls ---------- */
+function slider(cfg){
+  const wrap=document.createElement('div'); wrap.className='slider';
+  const top=document.createElement('div'); top.className='top';
+  const lbl=document.createElement('span'); lbl.className='lbl'; lbl.textContent=cfg.label;
+  const val=document.createElement('span'); val.className='val';
+  top.appendChild(lbl); top.appendChild(val);
+  const inp=document.createElement('input');
+  inp.type='range'; inp.min=cfg.min; inp.max=cfg.max; inp.step=cfg.step; inp.value=S[cfg.key];
+  inp.setAttribute('aria-label',cfg.label);
+  const readout=()=>{ val.textContent=fmtVal(S[cfg.key],cfg.fmt); };
+  inp.addEventListener('input',()=>{ S[cfg.key]=parseFloat(inp.value); readout(); render(); });
+  wrap.appendChild(top); wrap.appendChild(inp);
+  wrap._readout=readout; wrap._input=inp; wrap._key=cfg.key;
+  readout();
+  return wrap;
+}
+const allSliders=[];
+function buildGroup(id,list){
+  const g=document.getElementById(id);
+  list.forEach(cfg=>{ const sl=slider(cfg); g.appendChild(sl); allSliders.push(sl); });
+}
+buildGroup('grp-product',CFG.product);
+buildGroup('grp-costs',CFG.costs);
+buildGroup('grp-growth',CFG.growth);
+
+/* schedule steppers */
+const schedEl=document.getElementById('sched');
+function buildSched(){
+  schedEl.innerHTML='';
+  S.schedule.forEach((n,i)=>{
+    const d=document.createElement('div'); d.className='step';
+    d.innerHTML=`<div class="yl">Y${i+1}</div>
+      <div class="box"><button data-i="${i}" data-d="-1">–</button>
+      <span class="n" id="n-${i}">${n}</span>
+      <button data-i="${i}" data-d="1">+</button></div>`;
+    schedEl.appendChild(d);
+  });
+  schedEl.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    const i=+b.dataset.i, dir=+b.dataset.d;
+    S.schedule[i]=Math.max(0,Math.min(9,S.schedule[i]+dir));
+    document.getElementById('n-'+i).textContent=S.schedule[i];
+    updateCum(); render();
+  }));
+  updateCum();
+}
+function updateCum(){
+  let c=0; const cum=S.schedule.map(n=>c+=n);
+  document.getElementById('schedcum').innerHTML='Cumulative: '+cum.map(x=>`<b>${x}</b>`).join(' → ');
+}
+buildSched();
+
+document.getElementById('reset').addEventListener('click',()=>{
+  S=JSON.parse(JSON.stringify(DEF));
+  allSliders.forEach(sl=>{ sl._input.value=S[sl._key]; sl._readout(); });
+  buildSched(); render();
+});
+
+render();
+</script>
+</body>
+</html>
