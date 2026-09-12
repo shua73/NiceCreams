@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soft-Serve Truck — Projection Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Archivo:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --milk:#EDF1EC; --paper:#FBFCFA; --ink:#16231F; --pine:#1E4A40;
+    --aqua:#2E9C8B; --aqua-soft:#D6EDE7; --butter:#E0A93B; --cream:#F8E4BC;
+    --cherry:#C4394A; --cherry-soft:#F6DFE1; --berry:#4A6FA5; --steel:#6E7F79;
+    --line:#D8E0D9; --ghost:#E4EAE4;
+    --display:'Bricolage Grotesque','Archivo',system-ui,sans-serif;
+    --body:'Archivo',system-ui,-apple-system,sans-serif;
+    --mono:'DM Mono','SFMono-Regular',ui-monospace,monospace;
+    --shadow:0 1px 2px rgba(22,35,31,.05), 0 8px 22px -16px rgba(22,35,31,.3);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--milk);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.4;-webkit-font-smoothing:antialiased}
+  :focus-visible{outline:2px solid var(--aqua);outline-offset:2px;border-radius:6px}
+
+  .app{height:100%;display:flex;flex-direction:column;gap:11px;padding:13px 14px 14px;max-width:1660px;margin:0 auto}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+
+  .topbar{display:flex;align-items:center;gap:14px;flex:none}
+  .brand{display:flex;align-items:baseline;gap:11px;min-width:0}
+  .brand h1{font-family:var(--display);font-weight:800;font-size:21px;letter-spacing:-.025em;margin:0;white-space:nowrap}
+  .brand h1 em{font-style:normal;color:var(--aqua)}
+  .brand .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .spacer{flex:1}
+  .badge{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;padding:8px 13px;border-radius:999px;border:1.5px solid currentColor;white-space:nowrap}
+  .badge.short{color:var(--cherry);background:var(--cherry-soft)}
+  .badge.clear{color:var(--pine);background:var(--aqua-soft)}
+  .ghostbtn{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;background:none;border:1.5px solid var(--line);color:var(--steel);padding:8px 13px;border-radius:999px;cursor:pointer}
+  .ghostbtn:hover{border-color:var(--ink);color:var(--ink)}
+
+  .stage{flex:1;min-height:0;display:grid;grid-template-columns:206px minmax(0,1fr);gap:11px}
+
+  .gauge{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 8px 13px;text-align:center;
+    background:
+      radial-gradient(circle at 18% 22%, rgba(224,169,59,.40) 1.3px, transparent 1.4px) 0 0/52px 52px,
+      radial-gradient(circle at 72% 64%, rgba(196,57,74,.32) 1.1px, transparent 1.2px) 0 0/66px 66px,
+      radial-gradient(circle at 40% 88%, rgba(46,156,139,.32) 1.1px, transparent 1.2px) 0 0/78px 78px,
+      var(--paper);}
+  .gauge svg{flex:1;min-height:0;width:100%;max-height:290px;display:block}
+  .gauge .readout{font-family:var(--display);font-weight:700;font-size:29px;letter-spacing:-.02em;line-height:1;margin-top:4px}
+  .gauge .sub{font-family:var(--mono);font-size:10.5px;color:var(--steel);margin-top:5px;line-height:1.5}
+
+  .panel{display:flex;flex-direction:column;min-width:0;min-height:0}
+  .stats{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;border-bottom:1px solid var(--line);flex:none}
+  .stat{padding:10px 13px;border-right:1px solid var(--line);min-width:0}
+  .stat:last-child{border-right:none}
+  .stat .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--steel);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stat .v{font-family:var(--display);font-weight:700;letter-spacing:-.02em;font-size:22px;line-height:1.15;margin-top:3px;white-space:nowrap}
+  .stat.hero .v{font-size:31px}
+  .stat .f{font-family:var(--mono);font-size:10px;color:var(--steel);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pos{color:var(--pine)} .neg{color:var(--cherry)}
+
+  .viewhead{display:flex;align-items:center;gap:12px;padding:7px 13px 3px;flex:none}
+  .viewhead .note{font-family:var(--mono);font-size:10.5px;color:var(--steel)}
+  .seg{display:flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden}
+  .seg button{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;background:none;border:none;color:var(--steel);padding:5px 12px;cursor:pointer}
+  .seg button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+  .view{flex:1;min-height:0;position:relative}
+  #chart{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+  #chart.list{cursor:crosshair}
+  #tableview{position:absolute;inset:0;overflow:auto;padding:0 10px 10px}
+  table.grid{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px}
+  table.grid th{position:sticky;top:0;background:var(--paper);font-weight:500;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--steel);text-align:right;padding:7px 8px;border-bottom:1.5px solid var(--ink);white-space:nowrap}
+  table.grid th:first-child{text-align:left}
+  table.grid td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  table.grid td:first-child{text-align:left;font-family:var(--body);font-size:12.5px}
+  tr.rule td{border-top:1.5px solid var(--ink);font-weight:600}
+  tr.dim td{color:var(--steel)}
+  .hidden{display:none!important}
+
+  .console{flex:none;display:flex;align-items:stretch;padding:9px 4px 11px;overflow-x:auto}
+  .bank{display:flex;flex-direction:column;padding:0 11px;border-right:1px solid var(--line)}
+  .bank:last-child{border-right:none}
+  .bank h2{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;margin:0 0 7px;color:var(--steel);white-space:nowrap}
+  .bank h2 b{color:var(--ink);font-weight:500}
+  .faders{display:flex;gap:7px;flex:1}
+
+  .fader{width:52px;display:flex;flex-direction:column;align-items:center;text-align:center}
+  .fader .val{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--ink);height:15px;white-space:nowrap}
+  .slot{position:relative;width:36px;height:116px;margin:5px 0 4px;cursor:grab;touch-action:none;border-radius:8px}
+  .slot:active{cursor:grabbing}
+  .track{position:absolute;top:9px;bottom:9px;left:0;right:0}
+  .rail{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:5px;border-radius:3px;background:var(--ghost);box-shadow:inset 0 1px 2px rgba(22,35,31,.18)}
+  .fill{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:5px;border-radius:3px;background:var(--accent)}
+  .cap{position:absolute;left:1px;width:34px;height:14px;border-radius:5px;background:var(--paper);border:1.5px solid var(--ink);
+       box-shadow:0 2px 4px rgba(22,35,31,.22);transform:translateY(50%);display:flex;align-items:center;justify-content:center}
+  .cap::after{content:'';width:19px;height:2px;border-radius:2px;background:var(--accent)}
+  .slot:hover .cap{border-color:var(--accent)}
+  .ticks{position:absolute;top:9px;bottom:9px;left:50%;transform:translateX(-50%);width:20px;pointer-events:none}
+  .ticks i{position:absolute;left:0;right:0;height:1px;background:var(--line)}
+  .fader .lab{font-family:var(--body);font-size:10px;font-weight:500;line-height:1.18;color:var(--ink);height:24px;display:flex;align-items:center;justify-content:center}
+  .fader .unit{font-family:var(--mono);font-size:8.5px;color:var(--steel);line-height:1.25;margin-top:1px}
+
+  @media (max-width:1000px), (max-height:620px){
+    html,body{height:auto}
+    .app{height:auto}
+    .stage{grid-template-columns:1fr}
+    .gauge{min-height:250px}
+    .gauge svg{max-height:190px}
+    .view{min-height:280px}
+    .stats{grid-template-columns:1fr 1fr}
+    .stat{border-bottom:1px solid var(--line)}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <h1>Soft-serve <em>truck</em></h1>
+      <span class="eyebrow">List-led routing · evening service · shoulder-season morning bowls</span>
+    </div>
+    <span class="spacer"></span>
+    <span id="verdict" class="badge short">—</span>
+    <button id="reset" class="ghostbtn" type="button">Reset</button>
+  </header>
+
+  <main class="stage">
+
+    <section class="card gauge">
+      <svg viewBox="0 0 220 330" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="gaugeTitle">
+        <title id="gaugeTitle">Servings per night against break-even</title>
+        <defs>
+          <clipPath id="swirlClip">
+            <path d="M76 200 L144 200 L110 318 Z"/>
+            <ellipse cx="110" cy="196" rx="43" ry="21"/><ellipse cx="104" cy="172" rx="41" ry="20"/>
+            <ellipse cx="116" cy="150" rx="36" ry="19"/><ellipse cx="104" cy="128" rx="31" ry="17"/>
+            <ellipse cx="115" cy="108" rx="25" ry="15"/><ellipse cx="106" cy="90" rx="19" ry="13"/>
+            <ellipse cx="112" cy="75" rx="13" ry="11"/><ellipse cx="109" cy="63" rx="8" ry="9"/>
+          </clipPath>
+          <clipPath id="coneClip"><path d="M76 200 L144 200 L110 318 Z"/></clipPath>
+          <linearGradient id="creamGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FBEFD3"/><stop offset="100%" stop-color="#EFD094"/>
+          </linearGradient>
+          <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#16231F" flood-opacity=".13"/>
+          </filter>
+        </defs>
+        <g filter="url(#soft)"><g clip-path="url(#swirlClip)">
+          <rect x="0" y="0" width="220" height="330" fill="var(--ghost)"/>
+          <rect id="fillRect" x="0" y="318" width="220" height="0" fill="url(#creamGrad)"/>
+        </g></g>
+        <g clip-path="url(#coneClip)" stroke="#B99A63" stroke-opacity=".5" stroke-width="1">
+          <path d="M56 206 L172 300 M56 226 L162 312 M56 246 L150 322 M56 266 L134 330 M56 286 L118 330 M164 206 L48 300 M164 226 L58 312 M164 246 L70 322 M164 266 L86 330 M164 286 L102 330"/>
+        </g>
+        <g fill="none" stroke="#16231F" stroke-opacity=".13" stroke-width="1.4" stroke-linecap="round">
+          <path d="M72 190 Q110 208 150 188"/><path d="M66 166 Q104 184 143 164"/>
+          <path d="M82 144 Q116 161 150 142"/><path d="M75 122 Q104 138 133 120"/>
+          <path d="M92 102 Q115 116 138 100"/><path d="M89 85 Q107 96 124 83"/>
+        </g>
+        <g id="beMark">
+          <line x1="16" y1="186" x2="204" y2="186" stroke="var(--cherry)" stroke-width="1.6" stroke-dasharray="5 4"/>
+          <text id="beLabel" x="16" y="178" font-family="DM Mono, monospace" font-size="11" fill="var(--cherry)">break-even</text>
+        </g>
+        <g id="cherry" opacity="0">
+          <path d="M110 50 Q116 40 124 36" stroke="#4A7A2E" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="109" cy="53" r="9.5" fill="var(--cherry)"/>
+          <circle cx="106" cy="50" r="2.6" fill="#fff" opacity=".45"/>
+        </g>
+      </svg>
+      <div class="readout" id="volReadout">—</div>
+      <div class="sub" id="volSub">servings / night</div>
+    </section>
+
+    <section class="card panel">
+      <div class="stats">
+        <div class="stat hero">
+          <div class="k">Annual profit after truck payback</div>
+          <div class="v" id="o-year">—</div><div class="f" id="o-year-f">—</div>
+        </div>
+        <div class="stat"><div class="k">Per evening</div><div class="v" id="o-night">—</div><div class="f" id="o-night-f">—</div></div>
+        <div class="stat"><div class="k">List needed</div><div class="v" id="o-list">—</div><div class="f" id="o-list-f">—</div></div>
+        <div class="stat"><div class="k">Your hourly</div><div class="v" id="o-owner">—</div><div class="f" id="o-owner-f">—</div></div>
+        <div class="stat"><div class="k">Truck paid back</div><div class="v" id="o-payback">—</div><div class="f" id="o-payback-f">—</div></div>
+      </div>
+
+      <div class="viewhead">
+        <div class="seg" role="group" aria-label="View">
+          <button type="button" data-view="list" aria-pressed="true">List</button>
+          <button type="button" data-view="money" aria-pressed="false">Money</button>
+          <button type="button" data-view="table" aria-pressed="false">Table</button>
+        </div>
+        <span class="note" id="viewnote">Drag across the chart to size the subscriber list</span>
+      </div>
+
+      <div class="view">
+        <svg id="chart" class="list" role="img" aria-label="Annual profit by subscriber list size"></svg>
+        <div id="tableview" class="hidden">
+          <table class="grid">
+            <thead><tr><th>Line</th><th>Per evening</th><th>Per morning</th><th>Annual</th><th>% of revenue</th></tr></thead>
+            <tbody id="pl"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="card console" id="console"></footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const CARD_FEE = 0.03;      // card processing, share of ticket
+  const MORNING_HOURS = 3;    // paid hours for a morning bowl shift
+
+  const DEFAULTS = {
+    price:6, coneCost:1.05,
+    list:1200, turnout:.04, walkup:.25, perTicket:1.9,
+    hoursNight:5.5, nightsWeek:5, eveWeeks:22,
+    bowlPrice:8.5, bowlCost:2.75, bowls:35, mornWeek:4, mornWeeks:14,
+    wage:15, fuel:35, insurance:325, commissary:450,
+    truck:30000, upgrades:10000, recoveryYears:5
+  };
+  const state = Object.assign({}, DEFAULTS);
+
+  const MINUS='\u2212';
+  const nf=(n,d)=>Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+  const usd=(n,d=0)=>(n<-0.004?MINUS:'')+'$'+nf(n,d);
+  const usdk=n=>(n<0?MINUS:'')+'$'+nf(Math.abs(n)/1000,Math.abs(n)<10000?1:0)+'k';
+  const num=(n,d=0)=>(n<0?MINUS:'')+nf(n,d);
+  const pct=(n,d=0)=>(n<0?MINUS:'')+nf(n*100,d)+'%';
+
+  /* ---------------- model ---------------- */
+  function compute(listOverride){
+    const s = state;
+    const list = listOverride === undefined ? s.list : listOverride;
+
+    // per-serving economics
+    const coneVar = s.coneCost + s.price*CARD_FEE;
+    const coneContrib = s.price - coneVar;
+    const bowlVar = s.bowlCost + s.bowlPrice*CARD_FEE;
+    const bowlContrib = s.bowlPrice - bowlVar;
+
+    // volume: the list is the engine
+    const tickets = list * s.turnout * (1 + s.walkup);
+    const servings = tickets * s.perTicket;
+
+    // shifts per year
+    const nights = s.nightsWeek * s.eveWeeks;
+    const mornings = s.mornWeek * s.mornWeeks;
+
+    // per-shift
+    const nightRev = servings * s.price;
+    const nightVar = servings * coneVar;
+    const nightLabor = s.wage * s.hoursNight;
+    const nightFuel = s.fuel;
+    const nightProfit = nightRev - nightVar - nightLabor - nightFuel;
+
+    const mornRev = s.bowls * s.bowlPrice;
+    const mornVar = s.bowls * bowlVar;
+    const mornLabor = s.wage * MORNING_HOURS;
+    const mornFuel = s.fuel * 0.5;
+    const mornProfit = mornRev - mornVar - mornLabor - mornFuel;
+
+    // annual
+    const startup = s.truck + s.upgrades;
+    const recovery = startup / Math.max(s.recoveryYears,.5);
+    const overhead = (s.insurance + s.commissary) * 12;
+    const revenue = nights*nightRev + mornings*mornRev;
+    const variable = nights*nightVar + mornings*mornVar;
+    const labor = nights*nightLabor + mornings*mornLabor;
+    const fuel = nights*nightFuel + mornings*mornFuel;
+    const cash = revenue - variable - labor - fuel - overhead;
+    const profit = cash - recovery;
+    const ownerHours = nights*s.hoursNight + mornings*MORNING_HOURS;
+    const payback = cash > 0 ? startup/cash : Infinity;
+    const margin = revenue > 0 ? profit/revenue : 0;
+
+    // break-even servings per evening, holding mornings and the calendar fixed
+    const perNightBurden = nights > 0 ? (overhead + recovery - mornings*mornProfit)/nights : Infinity;
+    const beServings = coneContrib > 0 && isFinite(perNightBurden)
+      ? Math.max(0, Math.ceil((perNightBurden + nightLabor + nightFuel)/coneContrib)) : Infinity;
+    const perSub = s.turnout*(1+s.walkup)*s.perTicket;      // servings per subscriber per night
+    const beList = perSub > 0 && isFinite(beServings) ? Math.ceil(beServings/perSub) : Infinity;
+
+    return {list,coneVar,coneContrib,bowlVar,bowlContrib,tickets,servings,nights,mornings,
+            nightRev,nightVar,nightLabor,nightFuel,nightProfit,mornRev,mornVar,mornLabor,mornFuel,mornProfit,
+            startup,recovery,overhead,revenue,variable,labor,fuel,cash,profit,ownerHours,payback,margin,
+            beServings,beList,perSub};
+  }
+
+  /* ---------------- console ---------------- */
+  const BANKS = [
+    {title:'Cones', accent:'var(--aqua)', faders:[
+      {k:'price',    lab:'Cone price', unit:'/ serving', min:2, max:12, step:.25, fmt:v=>usd(v,2)},
+      {k:'coneCost', lab:'Mix + cone', unit:'/ serving', min:.25,max:4, step:.05, fmt:v=>usd(v,2)}
+    ]},
+    {title:'Reach', accent:'var(--butter)', faders:[
+      {k:'list',      lab:'List size',  unit:'app + sms', min:0, max:6000, step:50, fmt:v=>num(v)},
+      {k:'turnout',   lab:'Turnout',    unit:'buy tonight',min:.005,max:.15,step:.005,fmt:v=>pct(v,1)},
+      {k:'walkup',    lab:'Walk-ups',   unit:'on top',    min:0, max:1.5, step:.05, fmt:v=>'+'+pct(v,0)},
+      {k:'perTicket', lab:'Per order',  unit:'servings',  min:1, max:4,   step:.1,  fmt:v=>num(v,1)}
+    ]},
+    {title:'Evenings', accent:'var(--pine)', faders:[
+      {k:'hoursNight',lab:'Paid hours', unit:'/ night',   min:2, max:10, step:.5, fmt:v=>num(v,1)},
+      {k:'nightsWeek',lab:'Nights',     unit:'/ week',    min:1, max:7,  step:1,  fmt:v=>num(v)},
+      {k:'eveWeeks',  lab:'Weeks',      unit:'/ year',    min:4, max:40, step:1,  fmt:v=>num(v)}
+    ]},
+    {title:'Morning bowls', accent:'var(--berry)', faders:[
+      {k:'bowlPrice', lab:'Bowl price', unit:'/ bowl',    min:3, max:16, step:.25, fmt:v=>usd(v,2)},
+      {k:'bowlCost',  lab:'Bowl cost',  unit:'/ bowl',    min:.5,max:7,  step:.05, fmt:v=>usd(v,2)},
+      {k:'bowls',     lab:'Pre-orders', unit:'/ morning', min:0, max:150,step:5,   fmt:v=>num(v)},
+      {k:'mornWeek',  lab:'Mornings',   unit:'/ week',    min:0, max:7,  step:1,   fmt:v=>num(v)},
+      {k:'mornWeeks', lab:'Weeks',      unit:'/ year',    min:0, max:30, step:1,   fmt:v=>num(v)}
+    ]},
+    {title:'Running costs', accent:'var(--steel)', faders:[
+      {k:'wage',      lab:'Helper wage',unit:'/ hour',    min:10,max:30, step:.5,  fmt:v=>usd(v,2)},
+      {k:'fuel',      lab:'Fuel + upkeep',unit:'/ night', min:0, max:150,step:5,   fmt:v=>usd(v)},
+      {k:'insurance', lab:'Insurance + permits',unit:'/ month',min:0,max:1200,step:25,fmt:v=>usd(v)},
+      {k:'commissary',lab:'Commissary + app',unit:'/ month',min:0,max:1500,step:25,fmt:v=>usd(v)}
+    ]},
+    {title:'Build-out', accent:'var(--cherry)', faders:[
+      {k:'truck',     lab:'Truck + gear', unit:'as bought', min:10000,max:120000,step:1000, fmt:v=>usdk(v)},
+      {k:'upgrades',  lab:'Upgrades',     unit:'2nd machine, wrap', min:0,max:60000,step:500, fmt:v=>usdk(v)},
+      {k:'recoveryYears',lab:'Recover in',unit:'years',     min:1, max:12, step:.5, fmt:v=>num(v,1)}
+    ]}
+  ];
+
+  const faders = {};
+
+  function buildConsole(){
+    const host = document.getElementById('console');
+    BANKS.forEach(bank=>{
+      const el = document.createElement('div');
+      el.className='bank';
+      el.style.setProperty('--accent', bank.accent);
+      el.innerHTML = '<h2><b>'+bank.title+'</b></h2><div class="faders"></div>';
+      const row = el.querySelector('.faders');
+      bank.faders.forEach(cfg=>{
+        const f = document.createElement('div');
+        f.className='fader';
+        f.innerHTML =
+          '<div class="val" id="fv-'+cfg.k+'"></div>'+
+          '<div class="slot" tabindex="0" role="slider" id="fs-'+cfg.k+'" aria-label="'+cfg.lab+' '+cfg.unit+'" '+
+            'aria-valuemin="'+cfg.min+'" aria-valuemax="'+cfg.max+'" aria-orientation="vertical">'+
+            '<div class="track"><div class="rail"></div>'+
+            '<div class="ticks"><i style="top:0"></i><i style="top:25%"></i><i style="top:50%"></i><i style="top:75%"></i><i style="bottom:0"></i></div>'+
+            '<div class="fill"></div><div class="cap"></div></div></div>'+
+          '<div class="lab">'+cfg.lab+'</div><div class="unit">'+cfg.unit+'</div>';
+        row.appendChild(f);
+
+        const slot=f.querySelector('.slot'), track=f.querySelector('.track');
+        faders[cfg.k]={cfg,slot,track,fill:f.querySelector('.fill'),cap:f.querySelector('.cap'),val:f.querySelector('.val')};
+        const setFromY = y => {
+          const r=track.getBoundingClientRect();
+          const frac=1-(y-r.top)/r.height;
+          setValue(cfg.k, cfg.min + Math.max(0,Math.min(1,frac))*(cfg.max-cfg.min));
+        };
+        let drag=false;
+        slot.addEventListener('pointerdown',e=>{drag=true;slot.setPointerCapture(e.pointerId);setFromY(e.clientY);e.preventDefault();});
+        slot.addEventListener('pointermove',e=>{if(drag)setFromY(e.clientY);});
+        slot.addEventListener('pointerup',()=>{drag=false;});
+        slot.addEventListener('pointercancel',()=>{drag=false;});
+        slot.addEventListener('keydown',e=>{
+          const big=(cfg.max-cfg.min)/10; let v=state[cfg.k], hit=true;
+          switch(e.key){
+            case 'ArrowUp': case 'ArrowRight': v+=cfg.step; break;
+            case 'ArrowDown': case 'ArrowLeft': v-=cfg.step; break;
+            case 'PageUp': v+=big; break; case 'PageDown': v-=big; break;
+            case 'Home': v=cfg.min; break; case 'End': v=cfg.max; break;
+            default: hit=false;
+          }
+          if(hit){ e.preventDefault(); setValue(cfg.k,v); }
+        });
+      });
+      host.appendChild(el);
+    });
+  }
+
+  function snap(v,cfg){
+    const stepped=Math.round((v-cfg.min)/cfg.step)*cfg.step+cfg.min;
+    const clamped=Math.min(Math.max(stepped,cfg.min),cfg.max);
+    const d=(String(cfg.step).split('.')[1]||'').length;
+    return Number(clamped.toFixed(d));
+  }
+  function setValue(k,v){ state[k]=snap(v,faders[k].cfg); render(); }
+
+  function paintFaders(){
+    Object.keys(faders).forEach(k=>{
+      const {cfg,fill,cap,val,slot}=faders[k];
+      const p=(state[k]-cfg.min)/(cfg.max-cfg.min);
+      fill.style.height=(p*100)+'%';
+      cap.style.bottom=(p*100)+'%';
+      val.textContent=cfg.fmt(state[k]);
+      slot.setAttribute('aria-valuenow',state[k]);
+      slot.setAttribute('aria-valuetext',cfg.fmt(state[k]));
+    });
+  }
+
+  /* ---------------- charts ---------------- */
+  const chart=document.getElementById('chart');
+  let CW=760, CH=250, MODE='list';
+  const PAD={t:18,r:16,b:30,l:70};
+  const MONO='DM Mono, monospace';
+
+  function drawList(){
+    const m=compute();
+    const xMax=Math.max(1000, Math.ceil((Math.max(state.list, isFinite(m.beList)?m.beList:0)*2)/250)*250);
+    const p0=compute(0), p1=compute(xMax);
+    const lo=Math.min(p0.profit, 0), hi=Math.max(p1.profit, 0, p1.cash);
+    const span=(hi-lo)||1;
+    const X=v=>PAD.l+(v/xMax)*(CW-PAD.l-PAD.r);
+    const Y=v=>CH-PAD.b-((v-lo)/span)*(CH-PAD.t-PAD.b);
+    const profitAt=l=>compute(l).profit, cashAt=l=>compute(l).cash;
+    let g='';
+
+    for(let i=0;i<=4;i++){
+      const val=lo+span*i/4, y=Y(val);
+      g+='<line x1="'+PAD.l+'" y1="'+y+'" x2="'+(CW-PAD.r)+'" y2="'+y+'" stroke="var(--line)"/>';
+      g+='<text x="'+(PAD.l-8)+'" y="'+(y+4)+'" text-anchor="end" font-family="'+MONO+'" font-size="10" fill="var(--steel)">'+usdk(val)+'</text>';
+    }
+    for(let i=0;i<4;i++){
+      const v=xMax*i/4;
+      g+='<text x="'+X(v)+'" y="'+(CH-10)+'" text-anchor="middle" font-family="'+MONO+'" font-size="10" fill="var(--steel)">'+Math.round(v).toLocaleString()+'</text>';
+    }
+    g+='<text x="'+(CW-PAD.r)+'" y="'+(CH-10)+'" text-anchor="end" font-family="'+MONO+'" font-size="9" fill="var(--steel)" letter-spacing="1">SUBSCRIBERS ON THE LIST</text>';
+
+    // zero line + shading
+    const y0=Y(0);
+    const bx=isFinite(m.beList)?Math.min(m.beList,xMax):xMax;
+    g+='<polygon points="'+X(0)+','+Y(profitAt(0))+' '+X(bx)+','+Y(profitAt(bx))+' '+X(bx)+','+y0+' '+X(0)+','+y0+'" fill="var(--cherry)" opacity=".09"/>';
+    if(isFinite(m.beList)&&m.beList<xMax)
+      g+='<polygon points="'+X(bx)+','+y0+' '+X(xMax)+','+Y(profitAt(xMax))+' '+X(xMax)+','+y0+'" fill="var(--aqua)" opacity=".14"/>';
+    g+='<line x1="'+PAD.l+'" y1="'+y0+'" x2="'+(CW-PAD.r)+'" y2="'+y0+'" stroke="var(--ink)" stroke-width="1.3"/>';
+
+    g+='<line x1="'+X(0)+'" y1="'+Y(cashAt(0))+'" x2="'+X(xMax)+'" y2="'+Y(cashAt(xMax))+'" stroke="var(--steel)" stroke-width="1.6" stroke-dasharray="3 4"/>';
+    g+='<line x1="'+X(0)+'" y1="'+Y(profitAt(0))+'" x2="'+X(xMax)+'" y2="'+Y(profitAt(xMax))+'" stroke="var(--aqua)" stroke-width="2.6"/>';
+
+    if(isFinite(m.beList)&&m.beList<=xMax){
+      const x=X(m.beList);
+      g+='<line x1="'+x+'" y1="'+PAD.t+'" x2="'+x+'" y2="'+(CH-PAD.b)+'" stroke="var(--cherry)" stroke-width="1.2" stroke-dasharray="3 3"/>';
+      g+='<circle cx="'+x+'" cy="'+y0+'" r="5" fill="var(--paper)" stroke="var(--cherry)" stroke-width="2.4"/>';
+      g+='<text x="'+(x+8)+'" y="'+(y0-9)+'" font-family="'+MONO+'" font-size="10.5" fill="var(--cherry)">breaks even at '+m.beList.toLocaleString()+'</text>';
+    }
+    const cx=X(Math.min(state.list,xMax));
+    g+='<line x1="'+cx+'" y1="'+PAD.t+'" x2="'+cx+'" y2="'+(CH-PAD.b)+'" stroke="var(--ink)" stroke-width="1.4" opacity=".5"/>';
+    g+='<circle cx="'+cx+'" cy="'+Y(m.profit)+'" r="5" fill="var(--aqua)" stroke="var(--paper)" stroke-width="2"/>';
+    const lx=Math.min(cx+7, CW-PAD.r-104);
+    g+='<rect x="'+lx+'" y="'+PAD.t+'" width="102" height="20" rx="6" fill="var(--ink)"/>';
+    g+='<text x="'+(lx+51)+'" y="'+(PAD.t+14)+'" text-anchor="middle" font-family="'+MONO+'" font-size="10.5" fill="#fff">'+Math.round(state.list).toLocaleString()+' on list</text>';
+    g+='<text x="'+(PAD.l)+'" y="'+(PAD.t+11)+'" font-family="'+MONO+'" font-size="9.5" fill="var(--steel)">solid: after truck payback · dashed: cash</text>';
+    return g;
+  }
+
+  function drawMoney(){
+    const m=compute();
+    const bars=[
+      {l:'Evening cones', v:m.nights*m.nightRev, c:'var(--aqua)', up:true},
+      {l:'Morning bowls', v:m.mornings*m.mornRev, c:'var(--berry)', up:true},
+      {l:'Product cost',  v:-m.variable, c:'var(--butter)'},
+      {l:'Helper wages',  v:-m.labor, c:'var(--steel)'},
+      {l:'Fuel + upkeep', v:-m.fuel, c:'var(--steel)'},
+      {l:'Overhead', v:-m.overhead, c:'var(--steel)'},
+      {l:'Truck payback', v:-m.recovery, c:'var(--cherry)'},
+      {l:'Profit', v:m.profit, c:m.profit>=0?'var(--pine)':'var(--cherry)', total:true}
+    ];
+    const top=Math.max(m.revenue,1)*1.08;
+    const minRun=Math.min(0, m.profit)*1.2;
+    const lo=Math.min(0,minRun), hi=top, span=hi-lo;
+    const Y=v=>CH-PAD.b-((v-lo)/span)*(CH-PAD.t-PAD.b);
+    const n=bars.length, w=(CW-PAD.l-PAD.r)/n, bw=Math.min(w*.62,58);
+    let g='', run=0;
+    for(let i=0;i<=4;i++){
+      const val=lo+span*i/4, y=Y(val);
+      g+='<line x1="'+PAD.l+'" y1="'+y+'" x2="'+(CW-PAD.r)+'" y2="'+y+'" stroke="var(--line)"/>';
+      g+='<text x="'+(PAD.l-8)+'" y="'+(y+4)+'" text-anchor="end" font-family="'+MONO+'" font-size="10" fill="var(--steel)">'+usdk(val)+'</text>';
+    }
+    bars.forEach((b,i)=>{
+      const cx=PAD.l+w*i+w/2;
+      let y1,y2;
+      if(b.total){ y1=Y(Math.max(0,b.v)); y2=Y(Math.min(0,b.v)); }
+      else { const next=run+b.v; y1=Y(Math.max(run,next)); y2=Y(Math.min(run,next)); run=next; }
+      const h=Math.max(Math.abs(y2-y1),1.5);
+      g+='<rect x="'+(cx-bw/2)+'" y="'+y1+'" width="'+bw+'" height="'+h+'" rx="3" fill="'+b.c+'" opacity="'+(b.total?1:.88)+'"/>';
+      g+='<text x="'+cx+'" y="'+(y1-6)+'" text-anchor="middle" font-family="'+MONO+'" font-size="10" fill="var(--ink)">'+usdk(b.v)+'</text>';
+      const words=b.l.split(' ');
+      const lines=[]; let cur='';
+      words.forEach(wd=>{ if((cur+' '+wd).trim().length>13){lines.push(cur.trim());cur=wd;} else cur+=' '+wd; });
+      lines.push(cur.trim());
+      lines.slice(0,2).forEach((t,li)=>{
+        g+='<text x="'+cx+'" y="'+(CH-PAD.b+13+li*10)+'" text-anchor="middle" font-family="'+MONO+'" font-size="8.5" fill="var(--steel)">'+t+'</text>';
+      });
+    });
+    return g;
+  }
+
+  function drawChart(){
+    if(chart.classList.contains('hidden')) return;
+    chart.setAttribute('viewBox','0 0 '+CW+' '+CH);
+    chart.innerHTML = MODE==='money' ? drawMoney() : drawList();
+  }
+
+  let dragChart=false;
+  function chartSet(e){
+    if(MODE!=='list') return;
+    const r=chart.getBoundingClientRect();
+    const px=((e.clientX-r.left)/r.width)*CW;
+    const frac=(px-PAD.l)/(CW-PAD.l-PAD.r);
+    const m=compute();
+    const xMax=Math.max(1000, Math.ceil((Math.max(state.list, isFinite(m.beList)?m.beList:0)*2)/250)*250);
+    setValue('list', Math.max(0,Math.min(1,frac))*xMax);
+  }
+  chart.addEventListener('pointerdown',e=>{ if(MODE!=='list')return; dragChart=true; chart.setPointerCapture(e.pointerId); chartSet(e); });
+  chart.addEventListener('pointermove',e=>{ if(dragChart) chartSet(e); });
+  chart.addEventListener('pointerup',()=>{dragChart=false;});
+  chart.addEventListener('pointercancel',()=>{dragChart=false;});
+
+  const view=document.querySelector('.view');
+  if(window.ResizeObserver){
+    new ResizeObserver(es=>{
+      const r=es[0].contentRect;
+      CW=Math.max(340,Math.round(r.width)); CH=Math.max(190,Math.round(r.height));
+      drawChart();
+    }).observe(view);
+  }
+
+  document.querySelectorAll('.seg button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      MODE=b.dataset.view;
+      document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+      const table = MODE==='table';
+      chart.classList.toggle('hidden',table);
+      chart.classList.toggle('list',MODE==='list');
+      document.getElementById('tableview').classList.toggle('hidden',!table);
+      document.getElementById('viewnote').textContent =
+        MODE==='list' ? 'Drag across the chart to size the subscriber list'
+        : MODE==='money' ? 'Where a year of revenue ends up · overhead = insurance, permits, commissary, app'
+        : 'Card fee 3% of every ticket · morning shift paid at 3 hours';
+      render();
+    });
+  });
+  document.getElementById('reset').addEventListener('click',()=>{ Object.assign(state,DEFAULTS); render(); });
+
+  /* ---------------- render ---------------- */
+  const $=id=>document.getElementById(id);
+
+  function render(){
+    const m=compute();
+    paintFaders();
+
+    const vb=$('verdict');
+    if(m.profit>=0){ vb.className='badge clear'; vb.textContent='Clears by '+usd(m.profit)+' / year'; }
+    else { vb.className='badge short'; vb.textContent='Short by '+usd(Math.abs(m.profit))+' / year'; }
+
+    $('o-year').textContent=usd(m.profit);
+    $('o-year').className='v '+(m.profit>=0?'pos':'neg');
+    $('o-year-f').textContent=usd(m.revenue)+' in · '+usd(m.revenue-m.profit)+' out · '+pct(m.margin,0);
+
+    $('o-night').textContent=usd(m.nightProfit);
+    $('o-night').className='v '+(m.nightProfit>=0?'pos':'neg');
+    $('o-night-f').textContent=num(Math.round(m.servings))+' servings · '+num(Math.round(m.tickets))+' orders';
+
+    $('o-list').textContent=isFinite(m.beList)?num(m.beList):'—';
+    $('o-list-f').textContent=isFinite(m.beServings)
+      ? num(m.beServings)+' servings / night'
+      : 'cone price is below its cost';
+
+    $('o-owner').textContent=m.ownerHours>0?usd(m.profit/m.ownerHours):'—';
+    $('o-owner').className='v '+(m.profit>=0?'pos':'neg');
+    $('o-owner-f').textContent=num(Math.round(m.ownerHours))+' of your hours / year';
+
+    $('o-payback').textContent=isFinite(m.payback)?nf(m.payback,1)+' yr':'never';
+    $('o-payback').className='v '+(isFinite(m.payback)?'pos':'neg');
+    $('o-payback-f').textContent=isFinite(m.payback)
+      ? usd(m.startup)+' at '+usd(m.cash)+' cash / yr' : 'no cash surplus yet';
+
+    // gauge: servings per evening against break-even
+    const yB=318,yT=50;
+    const span=isFinite(m.beServings)&&m.beServings>0?m.beServings*2:Math.max(m.servings,1)*2;
+    const p=Math.max(0,Math.min(1,m.servings/(span||1)));
+    const fy=yB-p*(yB-yT);
+    $('fillRect').setAttribute('y',fy);
+    $('fillRect').setAttribute('height',yB-fy);
+    $('beMark').setAttribute('transform','translate(0,'+((yB-0.5*(yB-yT))-186)+')');
+    $('beLabel').textContent=isFinite(m.beServings)?'break-even '+m.beServings:'no break-even';
+    $('cherry').setAttribute('opacity', m.profit>0?'1':'0');
+    $('volReadout').textContent=num(Math.round(m.servings));
+    $('volSub').innerHTML='servings / night<br>'+(isFinite(m.beServings)
+      ? (m.servings>=m.beServings
+        ? '<span class="pos">'+num(Math.round(m.servings-m.beServings))+' above the line</span>'
+        : '<span class="neg">'+num(Math.round(m.beServings-m.servings))+' short of the line</span>')
+      : '<span class="neg">price below cone cost</span>');
+
+    drawChart();
+
+    if(MODE==='table'){
+      const R=(l,night,morn,year,cls)=>{
+        const share=m.revenue>0?Math.abs(year)/m.revenue:0;
+        return '<tr class="'+(cls||'')+'"><td>'+l+'</td><td>'+(night===null?'—':usd(night))+'</td><td>'+
+               (morn===null?'—':usd(morn))+'</td><td>'+usd(year)+'</td><td>'+(year===0?'—':pct(share,0))+'</td></tr>';
+      };
+      $('pl').innerHTML=[
+        R('Revenue', m.nightRev, m.mornRev, m.revenue),
+        R('Product + packaging', -m.nightVar, -m.mornVar, -m.variable,'dim'),
+        R('Helper wages', -m.nightLabor, -m.mornLabor, -m.labor,'dim'),
+        R('Fuel + upkeep', -m.nightFuel, -m.mornFuel, -m.fuel,'dim'),
+        R('Insurance, permits, commissary, app', null, null, -m.overhead,'dim'),
+        R('Cash before truck payback', m.nightProfit, m.mornProfit, m.cash,'rule'),
+        R('Truck + upgrade payback', null, null, -m.recovery,'dim'),
+        R('Profit', null, null, m.profit,'rule')
+      ].join('');
+    }
+  }
+
+  buildConsole();
+  render();
+  requestAnimationFrame(()=>{
+    const r=view.getBoundingClientRect();
+    CW=Math.max(340,Math.round(r.width)); CH=Math.max(190,Math.round(r.height));
+    render();
+  });
+})();
+</script>
+</body>
+</html>
