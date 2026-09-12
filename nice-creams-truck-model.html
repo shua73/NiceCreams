@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nice Creams Truck — Interactive Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1E3A32; --ink-soft:#42574f; --muted:#728178;
+    --paper:#F7F3E8; --panel:#FFFDF6;
+    --pistachio:#6BA292; --pistachio-deep:#3F7A69;
+    --amber:#E0A92E; --amber-deep:#C08815;
+    --brick:#B4463B; --brick-soft:#c96b60;
+    --line:rgba(30,58,50,.14); --line-strong:rgba(30,58,50,.28);
+    --display:'Fraunces',Georgia,serif;
+    --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{background:
+      radial-gradient(1200px 500px at 88% -8%, rgba(224,169,46,.10), transparent 60%),
+      radial-gradient(900px 500px at 3% 108%, rgba(107,162,146,.14), transparent 55%),
+      var(--paper);
+    color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;padding:26px 22px 34px;}
+  .wrap{max-width:1600px;margin:0 auto;background:var(--panel);border:1px solid var(--line);
+    border-radius:22px;overflow:hidden;box-shadow:0 30px 80px -50px rgba(30,58,50,.55);}
+
+  .mast{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;
+    padding:24px 34px;background:linear-gradient(180deg,#22463B,#1E3A32);color:#F4EFE1;}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand h1{font-family:var(--display);font-weight:600;font-size:30px;margin:0;letter-spacing:-.4px;color:#FBF5E6}
+  .brand p{margin:3px 0 0;font-size:13px;color:#B9C9C0;max-width:56ch}
+  .live{display:flex;gap:26px;text-align:right}
+  .live .k{font-size:12px;color:#AFC2B8}
+  .live .v{font-family:var(--display);font-weight:600;font-size:30px;line-height:1;color:var(--amber);letter-spacing:-.5px}
+  .live .v.alt{color:#F4EFE1}
+  .swirl{width:46px;height:60px;flex:0 0 auto}
+
+  .grid{display:grid;grid-template-columns:370px 1fr;gap:0}
+  .controls{border-right:1px solid var(--line);padding:22px 22px 26px;background:linear-gradient(180deg,#FFFFFF,#FBF7EC);}
+  .results{padding:24px 30px 28px;min-width:0}
+
+  .cgroup{margin-bottom:20px}
+  .cgroup h3{font-family:var(--display);font-weight:600;font-size:15px;margin:0 0 12px;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .cgroup h3::before{content:"";width:16px;height:3px;border-radius:2px;background:var(--pistachio)}
+  .cgroup.grow h3::before{background:var(--amber)}
+
+  .slider{margin-bottom:13px}
+  .slider .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+  .slider .lbl{font-size:12.5px;color:var(--ink-soft)}
+  .slider .val{font-family:var(--display);font-weight:600;font-size:14px;color:var(--pistachio-deep);font-variant-numeric:tabular-nums}
+  .cgroup.grow .slider .val{color:var(--amber-deep)}
+
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:3px;background:var(--line-strong);outline:none;cursor:pointer;margin:2px 0}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--amber);border:2px solid #fff;box-shadow:0 1px 4px rgba(30,58,50,.35);cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--amber);border:2px solid #fff;box-shadow:0 1px 4px rgba(30,58,50,.35);cursor:pointer}
+
+  .sched{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .step{text-align:center}
+  .step .yl{font-size:11px;color:var(--muted);margin-bottom:4px}
+  .step .box{display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fff}
+  .step button{border:0;background:transparent;width:22px;height:30px;font-size:15px;color:var(--pistachio-deep);cursor:pointer;font-weight:700}
+  .step button:hover{background:var(--paper)}
+  .step .n{font-family:var(--display);font-weight:600;font-size:15px;min-width:20px}
+  .schedcum{margin-top:8px;font-size:11.5px;color:var(--muted);text-align:center}
+  .schedcum b{color:var(--pistachio-deep)}
+
+  .resetbtn{margin-top:6px;width:100%;padding:9px;border:1px solid var(--line-strong);background:#fff;border-radius:10px;font-family:var(--sans);font-size:12.5px;color:var(--ink-soft);cursor:pointer;font-weight:600}
+  .resetbtn:hover{background:var(--paper)}
+
+  .rhead{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+  .rhead h2{font-family:var(--display);font-weight:600;font-size:20px;margin:0}
+  .rhead p{margin:0;color:var(--muted);font-size:12.5px}
+
+  .chartcard{border:1px solid var(--line);border-radius:16px;padding:14px 16px 10px;background:linear-gradient(180deg,#fff,#FCF9F0)}
+  svg.chart{width:100%;height:auto;display:block}
+  .yearrow{display:grid;grid-template-columns:repeat(5,1fr);margin-top:2px}
+  .yc{text-align:center;padding-top:8px;position:relative}
+  .yc::before{content:"";position:absolute;top:0;left:50%;width:1px;height:6px;background:var(--line-strong);transform:translateX(-.5px)}
+  .yc .yr{font-family:var(--display);font-weight:600;font-size:14px}
+  .yc .sh{font-size:11.5px;color:var(--muted)}
+  .yc .sh b{color:var(--pistachio-deep)}
+  .yc .loc{font-size:10.8px;color:var(--ink-soft);margin-top:4px;line-height:1.25;padding:0 4px}
+  .note{font-size:11.5px;color:var(--muted);margin:10px 2px 0;line-height:1.5}
+
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:18px 0 4px}
+  .kpi{border:1px solid var(--line);border-radius:13px;padding:13px;background:#fff}
+  .kpi .v{font-family:var(--display);font-weight:600;font-size:22px;line-height:1;letter-spacing:-.4px;font-variant-numeric:tabular-nums}
+  .kpi .l{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.25}
+  .kpi.amber{background:linear-gradient(155deg,#F3CC63,#E0A92E);border-color:transparent}
+  .kpi.amber .v{color:#2a2007} .kpi.amber .l{color:#5a4713}
+  .kpi .v.neg{color:var(--brick)}
+
+  .lower{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:20px}
+  .panel{border:1px solid var(--line);border-radius:16px;padding:18px 20px;background:#fff}
+  .panel h4{font-family:var(--display);font-weight:600;font-size:16px;margin:0 0 12px}
+
+  table.years{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  table.years th{font-size:11px;color:var(--muted);font-weight:600;text-align:right;padding:5px 6px;border-bottom:1px solid var(--line)}
+  table.years th:first-child{text-align:left}
+  table.years td{font-size:13px;padding:7px 6px;text-align:right;border-bottom:1px solid var(--line)}
+  table.years td:first-child{text-align:left;font-weight:600}
+  table.years tr:last-child td{border-bottom:0}
+  table.years .money{font-family:var(--display);font-weight:600}
+  table.years .neg{color:var(--brick)}
+
+  .econrow{display:flex;gap:10px;margin-bottom:12px}
+  .econbox{flex:1;border:1px solid var(--line);border-radius:11px;padding:11px 12px}
+  .econbox .t{font-size:11px;color:var(--muted);margin-bottom:5px;min-height:26px}
+  .econbox .r{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin:3px 0}
+  .econbox .r b{font-family:var(--display);font-weight:600;font-size:15px}
+  .econbox.mature{background:linear-gradient(180deg,#F6FBF8,#EEF6F1);border-color:rgba(63,122,105,.3)}
+
+  .bar{height:16px;border-radius:8px;background:var(--paper);position:relative;margin:6px 0;overflow:hidden;border:1px solid var(--line)}
+  .bar.mix{display:flex}
+  .fill{height:100%}
+  .row2{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-soft)}
+  .row2 b{font-family:var(--display)}
+
+  footer{padding:16px 34px 24px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);line-height:1.5;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  footer .site{color:var(--pistachio-deep);font-weight:600}
+
+  @media (max-width:1080px){
+    .grid{grid-template-columns:1fr}.controls{border-right:0;border-bottom:1px solid var(--line)}
+    .kpis{grid-template-columns:repeat(3,1fr)}.lower{grid-template-columns:1fr}.live{flex-wrap:wrap}
+  }
+  @media print{ body{padding:0}.wrap{box-shadow:none;border:0;border-radius:0} @page{size:landscape} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="mast">
+    <div class="brand">
+      <svg class="swirl" viewBox="0 0 60 78" aria-hidden="true">
+        <polygon points="20,44 40,44 30,74" fill="#E7D9B4"/>
+        <ellipse cx="30" cy="40" rx="21" ry="10" fill="#FBF5E6"/>
+        <ellipse cx="30" cy="30" rx="16" ry="9" fill="#F6EDD6"/>
+        <ellipse cx="30" cy="21" rx="11" ry="7.5" fill="#FBF5E6"/>
+        <path d="M30 8 C24 8 24 16 30 15 C36 16 36 9 30 8 Z" fill="#F6EDD6"/>
+        <circle cx="30" cy="9" r="3.4" fill="#B4463B"/>
+      </svg>
+      <div>
+        <h1>Nice Creams — on wheels</h1>
+        <p>Interactive five-year model for a soft-serve truck built around an SMS/app demand flywheel: the denser the list, the smarter the routes, the more you sell per stop.</p>
+      </div>
+    </div>
+    <div class="live">
+      <div><div class="k">Year-5 revenue</div><div class="v" id="live-rev">$0.0M</div></div>
+      <div><div class="k">Run-rate EBITDA</div><div class="v alt" id="live-ebitda">$0K</div></div>
+      <div><div class="k">Cash-on-cash</div><div class="v" id="live-coc">0%</div></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="controls">
+      <div class="cgroup" id="grp-product"><h3>One truck — product &amp; volume</h3></div>
+      <div class="cgroup" id="grp-costs"><h3>One truck — costs</h3></div>
+      <div class="cgroup grow" id="grp-growth"><h3>Flywheel, growth &amp; exit</h3></div>
+      <div class="cgroup grow">
+        <h3>Trucks added per year</h3>
+        <div class="sched" id="sched"></div>
+        <div class="schedcum" id="schedcum"></div>
+      </div>
+      <button class="resetbtn" id="reset">Reset to base assumptions</button>
+    </div>
+
+    <div class="results">
+      <div class="rhead"><h2>The ramp</h2><p>System revenue and fleet size, years one through five.</p></div>
+      <div class="chartcard">
+        <svg class="chart" id="chart" viewBox="0 0 1000 380" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Revenue growth chart"></svg>
+        <div class="yearrow" id="yearrow"></div>
+      </div>
+      <p class="note" id="modelnote"></p>
+
+      <div class="kpis" id="kpis"></div>
+
+      <div class="lower">
+        <div class="panel">
+          <h4>Year-by-year P&amp;L</h4>
+          <table class="years" id="ytable">
+            <thead><tr><th>Year</th><th>Trucks</th><th>Revenue</th><th>Net EBITDA</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h4>The engine behind one truck</h4>
+          <div class="econrow">
+            <div class="econbox">
+              <div class="t">Your truck today (owner-run, as entered)</div>
+              <div class="r"><span>Annual revenue</span><b id="e-orev">$0</b></div>
+              <div class="r"><span>EBITDA</span><b id="e-oeb">$0</b></div>
+              <div class="r"><span>Margin</span><b id="e-omarg">0%</b></div>
+            </div>
+            <div class="econbox mature">
+              <div class="t">Fleet truck (staffed, list matured)</div>
+              <div class="r"><span>EBITDA</span><b id="e-feb">$0</b></div>
+              <div class="r"><span>Margin</span><b id="e-fmarg">0%</b></div>
+              <div class="r"><span>Payback</span><b id="e-pay">0 mo</b></div>
+            </div>
+          </div>
+
+          <div style="font-size:12px;color:var(--muted);margin:2px 0 2px">Revenue mix (as entered)</div>
+          <div class="bar mix"><div class="fill" id="mix-eve" style="background:var(--pistachio)"></div><div class="fill" id="mix-bowl" style="background:var(--amber)"></div></div>
+          <div class="row2" style="margin-top:3px"><span>Evening soft serve <b id="mix-evev">$0</b></span><span>Morning bowls <b id="mix-bowlv">$0</b></span></div>
+
+          <div style="margin-top:12px">
+            <div style="font-size:12px;color:var(--muted);margin-bottom:2px">Evening break-even vs planned</div>
+            <div class="bar"><div class="fill" id="be-plan" style="background:var(--pistachio)"></div></div>
+            <div class="row2"><span>Planned volume</span><b id="e-plan">0/day</b></div>
+            <div class="bar"><div class="fill" id="be-break" style="background:var(--brick-soft)"></div></div>
+            <div class="row2"><span>Break-even (staffed truck)</span><b id="e-break">0/day</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div>Illustrative pro forma. Founder's own truck is modeled owner-run (one $15/hr assistant); every fleet truck carries a paid lead operator plus assistant, so the projection stands without the founder in the driver's seat. Evening days/month are weather-adjusted (Michigan winters run thin; spring/fall morning bowls fill the shoulder). Projections, not guarantees — not an offer of securities or investment advice.</div>
+    <div class="site">realnicecreams.com</div>
+  </footer>
+</div>
+
+<script>
+"use strict";
+const CFG = {
+  product:[
+    {key:'eveTicket',label:'Evening cone / cup price',min:4,max:12,step:.25,fmt:'money2'},
+    {key:'bowlTicket',label:'Morning bowl price',min:5,max:14,step:.25,fmt:'money2'},
+    {key:'eveServ',label:'Evening servings / day',min:30,max:250,step:5,fmt:'num'},
+    {key:'bowls',label:'Bowls / morning',min:0,max:150,step:5,fmt:'num'},
+    {key:'eveDays',label:'Evening days / month (avg)',min:8,max:26,step:1,fmt:'num'},
+    {key:'bowlDays',label:'Bowl days / year (spring+fall)',min:0,max:200,step:5,fmt:'num'},
+  ],
+  costs:[
+    {key:'eveCOGS',label:'Soft-serve cost / serving',min:.75,max:3.5,step:.05,fmt:'money2'},
+    {key:'bowlCOGS',label:'Bowl cost / serving',min:1,max:5,step:.05,fmt:'money2'},
+    {key:'cardFee',label:'Card fee',min:0,max:5,step:.1,fmt:'pct'},
+    {key:'wage',label:'Assistant wage / hr',min:12,max:24,step:.25,fmt:'money2'},
+    {key:'leadWage',label:'Fleet operator wage / hr',min:14,max:28,step:.25,fmt:'money2'},
+    {key:'eveHrs',label:'Evening hours / day',min:3,max:8,step:.5,fmt:'num'},
+    {key:'mornHrs',label:'Morning hours / day',min:1,max:5,step:.5,fmt:'num'},
+    {key:'fuel',label:'Fuel & maintenance / mo',min:200,max:2500,step:50,fmt:'money'},
+    {key:'commissary',label:'Commissary rent / mo',min:0,max:2000,step:50,fmt:'money'},
+    {key:'insure',label:'Insurance & permits / mo',min:100,max:1500,step:50,fmt:'money'},
+    {key:'appSms',label:'App & SMS platform / mo',min:0,max:1200,step:50,fmt:'money'},
+    {key:'buildOut',label:'Build-out / truck',min:25000,max:90000,step:2500,fmt:'money'},
+  ],
+  growth:[
+    {key:'flywheel',label:'Demand flywheel uplift (evenings)',min:0,max:60,step:5,fmt:'pct'},
+    {key:'openingPct',label:'Opening-year volume',min:30,max:95,step:5,fmt:'pct'},
+    {key:'rampPct',label:'Second-year volume',min:60,max:100,step:5,fmt:'pct'},
+    {key:'corpGA',label:'Corporate G&A (of revenue)',min:0,max:12,step:.5,fmt:'pct'},
+    {key:'exitMultiple',label:'Exit multiple (× EBITDA)',min:3,max:8,step:.5,fmt:'x'},
+    {key:'retailRev',label:'Pints & Treats Y5 revenue',min:0,max:1000,step:50,fmt:'numk'},
+  ]
+};
+const DEF = {eveTicket:7,bowlTicket:8.5,eveServ:100,bowls:50,eveDays:18,bowlDays:110,
+  eveCOGS:1.75,bowlCOGS:2.75,cardFee:3,wage:15,leadWage:18,eveHrs:5,mornHrs:3,
+  fuel:800,commissary:700,insure:500,appSms:250,buildOut:40000,
+  flywheel:25,openingPct:55,rampPct:85,corpGA:6,exitMultiple:4.5,retailRev:300,
+  schedule:[1,2,2,3,4]};
+let S = JSON.parse(JSON.stringify(DEF));
+
+const fmtVal=(v,f)=>{
+  if(f==='money2')return '$'+v.toFixed(2);
+  if(f==='money') return '$'+Math.round(v).toLocaleString();
+  if(f==='pct')   return (Math.round(v*10)/10)+'%';
+  if(f==='num')   return (Math.round(v*10)/10).toLocaleString();
+  if(f==='numk')  return '$'+Math.round(v)+'K';
+  if(f==='x')     return v.toFixed(1)+'×';
+  return v;
+};
+function money(v){const s=v<0?'−':'';const a=Math.abs(v);
+  if(a>=1e6)return s+'$'+(a/1e6).toFixed(a>=1e7?0:1)+'M';
+  if(a>=1e3)return s+'$'+Math.round(a/1e3)+'K';
+  return s+'$'+Math.round(a);}
+function millions(v){return '$'+(v/1e6).toFixed(v/1e6>=10?0:1)+'M';}
+
+function compute(){
+  const cardPct=S.cardFee/100;
+  const eveDaysYr=S.eveDays*12;
+  const hoursYr=S.eveHrs*eveDaysYr + S.mornHrs*S.bowlDays;   // labor hours per person per year
+  const otherYr=(S.fuel+S.commissary+S.insure+S.appSms)*12;
+
+  function calc(eveDay,bowlsMorn,staffed){
+    const eveServYr=eveDay*eveDaysYr;
+    const eveRev=eveServYr*S.eveTicket;
+    const eveCogs=eveServYr*(S.eveCOGS+S.eveTicket*cardPct);
+    const bowlYr=bowlsMorn*S.bowlDays;
+    const bowlRev=bowlYr*S.bowlTicket;
+    const bowlCogs=bowlYr*(S.bowlCOGS+S.bowlTicket*cardPct);
+    const rev=eveRev+bowlRev, cogs=eveCogs+bowlCogs;
+    const labor=(S.wage+(staffed?S.leadWage:0))*hoursYr;
+    return {rev,eveRev,bowlRev,eveCogs,bowlCogs,labor,other:otherYr,
+            ebitda:rev-cogs-labor-otherYr};
+  }
+
+  const matEveDay=S.eveServ*(1+S.flywheel/100);
+  const baseOwner=calc(S.eveServ,S.bowls,false);      // as entered, owner-run
+  const matStaffed=calc(matEveDay,S.bowls,true);       // fleet truck, matured list
+
+  // break-even evening servings/day (staffed truck), crediting bowl contribution
+  const contribEve=S.eveTicket-S.eveCOGS-S.eveTicket*cardPct;
+  const bowlContrib=matStaffed.bowlRev-matStaffed.bowlCogs;
+  const fixedStaffed=matStaffed.labor+otherYr;
+  const beYr=contribEve>0?(fixedStaffed-bowlContrib)/contribEve:Infinity;
+  const beDay=beYr>0?beYr/eveDaysYr:0;
+
+  // ramp fractions
+  const fOpen=S.openingPct/100,fRamp=S.rampPct/100;
+  const fAge=a=>a<=0?fOpen:a===1?fRamp:1;
+
+  const adds=S.schedule;let cum=0;const years=[];
+  for(let y=1;y<=5;y++){
+    cum+=adds[y-1];let rev=0,eb=0;
+    for(let k=1;k<=y;k++){const n=adds[k-1];if(!n)continue;
+      const f=fAge(y-k);const t=calc(matEveDay*f,S.bowls*f,true);rev+=n*t.rev;eb+=n*t.ebitda;}
+    let rr=0,re=0;if(y===5&&S.retailRev>0){rr=S.retailRev*1000;re=rr*.15;}
+    const ga=(S.corpGA/100)*rev;
+    years.push({y,units:cum,rev:rev+rr,ebitda:eb-ga+re});
+  }
+  const total=cum, capital=total*S.buildOut;
+  const runRate=total*matStaffed.ebitda-(S.corpGA/100)*(total*matStaffed.rev)+(S.retailRev>0?S.retailRev*1000*.15:0);
+  const payback=matStaffed.ebitda>0?S.buildOut/matStaffed.ebitda*12:Infinity;
+  const coc=capital>0?runRate/capital:0;
+  const ev=runRate*S.exitMultiple, gross=capital>0?ev/capital:0;
+
+  return {years,total,capital,runRate,payback,coc,ev,gross,
+    baseOwner,matStaffed,beDay,matEveDay};
+}
+
+function niceMax(v){const m=v/1e6*1.03;const steps=[.25,.5,.75,1,1.5,2,2.5,3,4,5,6,8,10];
+  for(const s of steps){if(m<=s)return s*1e6;}return Math.ceil(m)*1e6;}
+
+function renderChart(R){
+  const revs=R.years.map(y=>y.rev);
+  const axisMax=niceMax(Math.max(...revs,1));
+  const X=[100,300,500,700,900],TOP=28,BOT=340,H=BOT-TOP;
+  const y=v=>BOT-(v/axisMax)*H;let g='';
+  [0.25,0.5,0.75,1].forEach(t=>{const gy=BOT-t*H,val=axisMax*t;
+    g+=`<line x1="100" y1="${gy.toFixed(1)}" x2="900" y2="${gy.toFixed(1)}" stroke="rgba(30,58,50,.1)" stroke-width="1"/>`;
+    g+=`<text x="88" y="${(gy+4).toFixed(1)}" text-anchor="end" font-family="Inter" font-size="11.5" fill="#9aa79f">$${(val/1e6).toFixed(1)}M</text>`;});
+  g+=`<line x1="100" y1="${BOT}" x2="900" y2="${BOT}" stroke="rgba(30,58,50,.28)" stroke-width="1"/>`;
+  g+=`<text x="88" y="${BOT+4}" text-anchor="end" font-family="Inter" font-size="11.5" fill="#9aa79f">$0</text>`;
+  const pts=X.map((x,i)=>[x,y(revs[i])]);
+  g+=`<path d="M100,${BOT} L${pts.map(p=>p[0]+','+p[1].toFixed(1)).join(' L')} L900,${BOT} Z" fill="url(#area)"/>`;
+  g+=`<path d="M${pts.map(p=>p[0]+','+p[1].toFixed(1)).join(' L')}" fill="none" stroke="url(#stroke)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  pts.forEach((p,i)=>{const last=i===4;
+    g+=`<circle cx="${p[0]}" cy="${p[1].toFixed(1)}" r="${last?7:5}" fill="${last?'#E0A92E':'#3F7A69'}" ${last?'stroke="#C08815" stroke-width="2"':''}/>`;
+    g+=`<text x="${p[0]}" y="${(p[1]-13).toFixed(1)}" text-anchor="middle" font-family="Fraunces" font-weight="600" font-size="${last?16:13.5}" fill="#1E3A32">${millions(revs[i])}</text>`;});
+  const defs=`<defs>
+    <linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E0A92E" stop-opacity=".5"/><stop offset="0.55" stop-color="#6BA292" stop-opacity=".26"/><stop offset="1" stop-color="#6BA292" stop-opacity=".05"/></linearGradient>
+    <linearGradient id="stroke" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#3F7A69"/><stop offset="1" stop-color="#C08815"/></linearGradient></defs>`;
+  document.getElementById('chart').innerHTML=defs+g;
+
+  const locs=['East GR routes · build the list','GR metro · morning bowls','Rockford · Ada · Forest Hills','Holland · East Lansing','Detroit metro + Pints & Treats'];
+  document.getElementById('yearrow').innerHTML=R.years.map((yr,i)=>
+    `<div class="yc"><div class="yr">Year ${yr.y}</div><div class="sh"><b>${yr.units}</b> truck${yr.units!==1?'s':''}</div><div class="loc">${locs[i]}</div></div>`).join('');
+}
+
+function render(){
+  const R=compute();
+  renderChart(R);
+  const y5=R.years[4];
+  document.getElementById('live-rev').textContent=millions(y5.rev);
+  document.getElementById('live-ebitda').textContent=money(R.runRate);
+  document.getElementById('live-coc').textContent=Math.round(R.coc*100)+'%';
+
+  const pay=isFinite(R.payback)?R.payback.toFixed(1)+' mo':'—';
+  const kpi=[
+    {v:millions(y5.rev),l:'Year-5 system revenue'},
+    {v:money(R.runRate),l:'Mature run-rate EBITDA',neg:R.runRate<0},
+    {v:money(R.capital),l:'Capital deployed ('+R.total+' trucks)'},
+    {v:pay,l:'Payback per truck',amber:true},
+    {v:Math.round(R.coc*100)+'%',l:'Cash-on-cash (annual)',amber:true},
+    {v:millions(R.ev),l:'Value at '+S.exitMultiple.toFixed(1)+'× EBITDA'},
+  ];
+  document.getElementById('kpis').innerHTML=kpi.map(k=>
+    `<div class="kpi ${k.amber?'amber':''}"><div class="v ${k.neg?'neg':''}">${k.v}</div><div class="l">${k.l}</div></div>`).join('');
+
+  document.querySelector('#ytable tbody').innerHTML=R.years.map(yr=>
+    `<tr><td>Year ${yr.y}</td><td>${yr.units}</td><td class="money">${millions(yr.rev)}</td><td class="money ${yr.ebitda<0?'neg':''}">${money(yr.ebitda)}</td></tr>`).join('');
+
+  const bo=R.baseOwner, ms=R.matStaffed;
+  document.getElementById('e-orev').textContent=money(bo.rev);
+  document.getElementById('e-oeb').textContent=money(bo.ebitda);
+  document.getElementById('e-omarg').textContent=(bo.rev>0?bo.ebitda/bo.rev*100:0).toFixed(0)+'%';
+  document.getElementById('e-feb').textContent=money(ms.ebitda);
+  document.getElementById('e-fmarg').textContent=(ms.rev>0?ms.ebitda/ms.rev*100:0).toFixed(0)+'%';
+  document.getElementById('e-pay').textContent=isFinite(R.payback)?R.payback.toFixed(1)+' mo':'—';
+
+  const eveShare=bo.rev>0?bo.eveRev/bo.rev*100:0;
+  document.getElementById('mix-eve').style.width=eveShare+'%';
+  document.getElementById('mix-bowl').style.width=(100-eveShare)+'%';
+  document.getElementById('mix-evev').textContent=money(bo.eveRev);
+  document.getElementById('mix-bowlv').textContent=money(bo.bowlRev);
+
+  const be=isFinite(R.beDay)?Math.max(0,Math.round(R.beDay)):0;
+  const plan=Math.round(S.eveServ);
+  const scaleMax=Math.max(plan,be,1)*1.15;
+  document.getElementById('e-plan').textContent=plan+'/day';
+  document.getElementById('e-break').textContent=(isFinite(R.beDay)?be:'—')+'/day';
+  document.getElementById('be-plan').style.width=(plan/scaleMax*100)+'%';
+  document.getElementById('be-break').style.width=(isFinite(R.beDay)?be/scaleMax*100:0)+'%';
+  document.getElementById('be-break').style.background=be>plan?'var(--brick)':'var(--brick-soft)';
+
+  const c=S.corpGA>0?`${S.corpGA}% corporate G&A applied`:'no corporate G&A';
+  document.getElementById('modelnote').innerHTML=
+    `A matured truck's list lifts evening volume by <b>${S.flywheel}%</b> (${Math.round(R.matEveDay)}/evening). New trucks open at <b>${S.openingPct}%</b> of that, reach <b>${S.rampPct}%</b> in year two, then mature. `+
+    `Fixed costs (labor, fuel, commissary, insurance, app/SMS) don't shrink at low volume, so the ramp is honest. Fleet trucks carry a paid operator; ${c}. A truck also pays back its ~${money(S.buildOut)} build-out in about ${isFinite(R.payback)?R.payback.toFixed(1):'—'} months once matured.`;
+}
+
+function slider(cfg){
+  const wrap=document.createElement('div');wrap.className='slider';
+  const top=document.createElement('div');top.className='top';
+  const lbl=document.createElement('span');lbl.className='lbl';lbl.textContent=cfg.label;
+  const val=document.createElement('span');val.className='val';
+  top.appendChild(lbl);top.appendChild(val);
+  const inp=document.createElement('input');
+  inp.type='range';inp.min=cfg.min;inp.max=cfg.max;inp.step=cfg.step;inp.value=S[cfg.key];
+  inp.setAttribute('aria-label',cfg.label);
+  const readout=()=>{val.textContent=fmtVal(S[cfg.key],cfg.fmt);};
+  inp.addEventListener('input',()=>{S[cfg.key]=parseFloat(inp.value);readout();render();});
+  wrap.appendChild(top);wrap.appendChild(inp);
+  wrap._readout=readout;wrap._input=inp;wrap._key=cfg.key;readout();
+  return wrap;
+}
+const allSliders=[];
+function buildGroup(id,list){const g=document.getElementById(id);list.forEach(cfg=>{const sl=slider(cfg);g.appendChild(sl);allSliders.push(sl);});}
+buildGroup('grp-product',CFG.product);
+buildGroup('grp-costs',CFG.costs);
+buildGroup('grp-growth',CFG.growth);
+
+const schedEl=document.getElementById('sched');
+function buildSched(){
+  schedEl.innerHTML='';
+  S.schedule.forEach((n,i)=>{const d=document.createElement('div');d.className='step';
+    d.innerHTML=`<div class="yl">Y${i+1}</div><div class="box"><button data-i="${i}" data-d="-1">–</button><span class="n" id="n-${i}">${n}</span><button data-i="${i}" data-d="1">+</button></div>`;
+    schedEl.appendChild(d);});
+  schedEl.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    const i=+b.dataset.i,dir=+b.dataset.d;S.schedule[i]=Math.max(0,Math.min(9,S.schedule[i]+dir));
+    document.getElementById('n-'+i).textContent=S.schedule[i];updateCum();render();}));
+  updateCum();
+}
+function updateCum(){let c=0;const cum=S.schedule.map(n=>c+=n);
+  document.getElementById('schedcum').innerHTML='Cumulative: '+cum.map(x=>`<b>${x}</b>`).join(' → ');}
+buildSched();
+
+document.getElementById('reset').addEventListener('click',()=>{
+  S=JSON.parse(JSON.stringify(DEF));
+  allSliders.forEach(sl=>{sl._input.value=S[sl._key];sl._readout();});
+  buildSched();render();});
+
+render();
+</script>
+</body>
+</html>
