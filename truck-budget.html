@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nice Creams Budget Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Archivo:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --milk:#EDF1EC; --paper:#FBFCFA; --ink:#16231F; --pine:#1E4A40;
+    --aqua:#2E9C8B; --aqua-soft:#D6EDE7; --butter:#E0A93B; --butter-soft:#FBF0DA;
+    --cherry:#C4394A; --cherry-soft:#F6DFE1; --steel:#6E7F79; --line:#D8E0D9; --ghost:#E4EAE4;
+    --display:'Bricolage Grotesque','Archivo',system-ui,sans-serif;
+    --body:'Archivo',system-ui,-apple-system,sans-serif;
+    --mono:'DM Mono','SFMono-Regular',ui-monospace,monospace;
+    --shadow:0 1px 2px rgba(22,35,31,.05), 0 8px 22px -16px rgba(22,35,31,.3);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--milk);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  :focus-visible{outline:2px solid var(--aqua);outline-offset:2px;border-radius:6px}
+  .shell{max-width:1120px;margin:0 auto;padding:26px 20px 90px}
+
+  .masthead{display:flex;gap:22px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+    border-bottom:1.5px solid var(--ink);padding-bottom:20px}
+  .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--steel)}
+  h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,4.2vw,44px);line-height:.98;letter-spacing:-.028em;margin:8px 0 10px}
+  h1 em{font-style:normal;color:var(--aqua)}
+  .subtitle{color:var(--steel);font-size:14.5px;max-width:56ch}
+  .meter{display:flex;align-items:center;gap:14px;flex:none}
+  .meter svg{width:96px;height:150px;display:block}
+  .meter .figs{text-align:right}
+  .meter .pctv{font-family:var(--display);font-weight:800;font-size:32px;letter-spacing:-.03em;line-height:1;white-space:nowrap}
+  .meter .cnt{font-family:var(--mono);font-size:11px;color:var(--steel);margin-top:6px;white-space:nowrap}
+  .meter .cnt b{color:var(--ink);font-weight:500}
+
+  .toolbar{position:sticky;top:0;z-index:20;display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+    background:rgba(237,241,236,.93);backdrop-filter:blur(8px);
+    margin:0 -20px;padding:12px 20px;border-bottom:1px solid var(--line)}
+  .seg{display:flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden;background:var(--paper)}
+  .seg button{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    background:none;border:none;color:var(--steel);padding:7px 13px;cursor:pointer;white-space:nowrap}
+  .seg button:hover{color:var(--ink)}
+  .seg button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+  .search{flex:1;min-width:150px;position:relative}
+  .search input{width:100%;font-family:var(--body);font-size:13.5px;padding:8px 12px 8px 32px;
+    border:1.5px solid var(--line);border-radius:999px;background:var(--paper);color:var(--ink)}
+  .search input:focus{outline:none;border-color:var(--aqua)}
+  .search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--steel)}
+  .ghostbtn{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;background:var(--paper);
+    border:1.5px solid var(--line);color:var(--steel);padding:7px 13px;border-radius:999px;cursor:pointer;white-space:nowrap}
+  .ghostbtn:hover{border-color:var(--ink);color:var(--ink)}
+
+  .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:26px}
+  @media (max-width:720px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .stat{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px 16px}
+  .stat .st{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--steel)}
+  .stat .sv{font-family:var(--display);font-weight:700;font-size:22px;margin-top:4px;letter-spacing:-.01em}
+  .stat.accent .sv{color:var(--pine)}
+
+  #board{display:grid;grid-template-columns:repeat(auto-fit,minmax(206px,1fr));gap:14px;align-items:start;margin-top:26px}
+  .cat{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
+    padding:14px 14px 12px;display:flex;flex-direction:column;min-width:0}
+  .cat-head{display:flex;flex-direction:column;align-items:flex-start;gap:7px;margin-bottom:10px}
+  .cat-n{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--steel)}
+  .cat h2{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.015em;line-height:1.2}
+  .badge{font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;
+    padding:4px 9px;border-radius:999px;border:1.5px solid currentColor}
+  .cat[data-accent=butter] .badge{color:#9A6D14;background:var(--butter-soft)}
+  .cat[data-accent=aqua] .badge{color:var(--pine);background:var(--aqua-soft)}
+  .cat[data-accent=cherry] .badge{color:#8B2A38;background:var(--cherry-soft)}
+  .cat-bar{width:100%;height:5px;border-radius:3px;background:var(--ghost);overflow:hidden}
+  .cat-bar i{display:block;height:100%;border-radius:3px;background:var(--accent);transition:width .22s ease}
+  .cat-sub{font-family:var(--mono);font-size:10.5px;color:var(--steel)}
+  .cat[data-accent=butter]{--accent:var(--butter)}
+  .cat[data-accent=aqua]{--accent:var(--aqua)}
+  .cat[data-accent=cherry]{--accent:var(--cherry)}
+  .cat.hidden{display:none}
+
+  .rows{display:flex;flex-direction:column;gap:7px;max-height:64vh;overflow-y:auto;padding-right:3px;margin-right:-3px}
+  .row{display:flex;flex-wrap:wrap;align-items:flex-start;gap:9px 10px;padding:10px 11px;border-radius:11px;background:var(--paper);
+    border:1px solid var(--line);cursor:pointer;transition:border-color .15s}
+  .row:hover{border-color:var(--steel)}
+  .row.hide{display:none}
+  .row.off .rtitle,.row.off .rnote{color:var(--steel)}
+  .row.off .rtitle{text-decoration:line-through;text-decoration-color:var(--line)}
+  .box{flex:none;width:19px;height:19px;margin-top:1px;border-radius:6px;border:1.8px solid var(--steel);background:#fff;
+    display:grid;place-items:center;transition:all .15s}
+  .row.on .box{background:var(--pine);border-color:var(--pine)}
+  .box svg{width:12px;height:12px;color:#fff;opacity:0;transition:opacity .15s}
+  .row.on .box svg{opacity:1}
+  .rmain{flex:1 1 100px;min-width:0}
+  .rtitle{font-family:var(--display);font-weight:700;font-size:13.5px;letter-spacing:-.006em;line-height:1.3}
+  .rnote{font-size:11.5px;color:var(--steel);margin-top:2px;line-height:1.45}
+  .ress{display:inline-block;font-family:var(--mono);font-size:8.5px;letter-spacing:.07em;text-transform:uppercase;color:#9A6D14;
+    background:var(--butter-soft);padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:middle}
+  .rcost{flex:none;margin-left:auto;text-align:right;font-family:var(--display);font-weight:700;font-size:13px;white-space:nowrap}
+  .rcost small{display:block;font-family:var(--mono);font-weight:400;font-size:9.5px;color:var(--steel);margin-top:2px}
+
+  .empty{padding:40px 10px;text-align:center;font-family:var(--mono);font-size:12.5px;color:var(--steel)}
+  .hidden{display:none!important}
+
+  @media print{ .toolbar,.meter{display:none!important} body{background:#fff} .shell{padding:0} }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">Interactive budget &middot; toggle line items to build your own number</div>
+      <h1>Nice Creams <em>Budget</em></h1>
+      <p class="subtitle">Truck price is fixed at $25,000. Toggle every other line on or off, switch between low and high estimates, and watch the total move.</p>
+    </div>
+    <div class="meter">
+      <svg viewBox="0 0 220 330" role="img" aria-label="Total to launch, filling toward a $100,000 scale">
+        <defs>
+          <clipPath id="swirlClip">
+            <path d="M76 200 L144 200 L110 318 Z"/>
+            <ellipse cx="110" cy="196" rx="43" ry="21"/><ellipse cx="104" cy="172" rx="41" ry="20"/>
+            <ellipse cx="116" cy="150" rx="36" ry="19"/><ellipse cx="104" cy="128" rx="31" ry="17"/>
+            <ellipse cx="115" cy="108" rx="25" ry="15"/><ellipse cx="106" cy="90" rx="19" ry="13"/>
+            <ellipse cx="112" cy="75" rx="13" ry="11"/><ellipse cx="109" cy="63" rx="8" ry="9"/>
+          </clipPath>
+          <clipPath id="coneClip"><path d="M76 200 L144 200 L110 318 Z"/></clipPath>
+          <linearGradient id="creamGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FBEFD3"/><stop offset="100%" stop-color="#EFD094"/>
+          </linearGradient>
+          <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#16231F" flood-opacity=".13"/>
+          </filter>
+        </defs>
+        <g filter="url(#soft)"><g clip-path="url(#swirlClip)">
+          <rect x="0" y="0" width="220" height="330" fill="var(--ghost)"/>
+          <rect id="fillRect" x="0" y="318" width="220" height="0" fill="url(#creamGrad)"/>
+        </g></g>
+        <g clip-path="url(#coneClip)" stroke="#B99A63" stroke-opacity=".5" stroke-width="1">
+          <path d="M56 206 L172 300 M56 226 L162 312 M56 246 L150 322 M56 266 L134 330 M164 206 L48 300 M164 226 L58 312 M164 246 L70 322 M164 266 L86 330"/>
+        </g>
+        <g fill="none" stroke="#16231F" stroke-opacity=".13" stroke-width="1.4" stroke-linecap="round">
+          <path d="M72 190 Q110 208 150 188"/><path d="M66 166 Q104 184 143 164"/>
+          <path d="M82 144 Q116 161 150 142"/><path d="M75 122 Q104 138 133 120"/>
+          <path d="M92 102 Q115 116 138 100"/><path d="M89 85 Q107 96 124 83"/>
+        </g>
+        <g id="cherry" opacity="0">
+          <path d="M110 50 Q116 40 124 36" stroke="#4A7A2E" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="109" cy="53" r="9.5" fill="var(--cherry)"/>
+          <circle cx="106" cy="50" r="2.6" fill="#fff" opacity=".45"/>
+        </g>
+      </svg>
+      <div class="figs">
+        <div class="pctv" id="pctv">$25,000</div>
+        <div class="cnt" id="cnt">total to launch</div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toolbar">
+    <div class="seg" role="group" aria-label="Category">
+      <button type="button" data-cat="all" aria-pressed="true">All</button>
+      <button type="button" data-cat="truck" aria-pressed="false">Truck</button>
+      <button type="button" data-cat="equipment" aria-pressed="false">Equipment</button>
+      <button type="button" data-cat="interior" aria-pressed="false">Interior</button>
+      <button type="button" data-cat="branding" aria-pressed="false">Branding</button>
+      <button type="button" data-cat="ongoing" aria-pressed="false">Ongoing</button>
+    </div>
+    <div class="seg" role="group" aria-label="Estimate">
+      <button type="button" data-est="low" aria-pressed="true">Low estimate</button>
+      <button type="button" data-est="high" aria-pressed="false">High estimate</button>
+    </div>
+    <label class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg>
+      <input id="q" type="search" placeholder="Search line items&hellip;" aria-label="Search line items">
+    </label>
+    <button class="ghostbtn" id="essentialsOnly" type="button">Essentials only</button>
+    <button class="ghostbtn" id="selectAll" type="button">Select all</button>
+  </nav>
+
+  <div class="stats">
+    <div class="stat"><div class="st">Truck purchase</div><div class="sv">$25,000</div></div>
+    <div class="stat accent"><div class="st">Build-out selected</div><div class="sv" id="buildTotal">$0</div></div>
+    <div class="stat accent"><div class="st">Total to launch</div><div class="sv" id="launchTotal">$25,000</div></div>
+    <div class="stat"><div class="st">Annual operating</div><div class="sv" id="annualTotal">$0</div></div>
+  </div>
+
+  <main id="board"></main>
+  <div class="empty hidden" id="empty">Nothing matches that filter.</div>
+</div>
+
+<script>
+const CATS = [
+  {id:"truck", title:"Truck & mechanical", badge:"Get it running right", accent:"butter"},
+  {id:"equipment", title:"Machinery & equipment", badge:"Built to serve", accent:"aqua"},
+  {id:"interior", title:"Interior & safety", badge:"Pass inspection", accent:"butter"},
+  {id:"branding", title:"Branding & tech", badge:"Ready for the street", accent:"aqua"},
+  {id:"ongoing", title:"Ongoing annual operation", badge:"Per year, not one-time", accent:"cherry"}
+];
+
+const ITEMS = [
+  {id:"engine_tuneup", cat:"truck", title:"Engine tune-up", note:"Plugs, wires, fluids, belts, cooling system.", low:400, high:1200, essential:true, on:true},
+  {id:"deferred_repairs", cat:"truck", title:"Deferred repairs", note:"Brakes, suspension bushings, exhaust manifold leaks common on this chassis.", low:800, high:3000, essential:true, on:true},
+  {id:"transmission", cat:"truck", title:"Transmission service", note:"Fluid and filter service for the TH400 / 4L80E.", low:200, high:600, essential:true, on:true},
+  {id:"sound_deadening", cat:"truck", title:"Sound deadening & cab insulation", note:"Quieter cab and service area.", low:300, high:900, essential:false, on:false},
+  {id:"dot_inspection", cat:"truck", title:"DOT inspection & registration", note:"Commercial vehicle safety inspection and titling.", low:150, high:500, essential:true, on:true},
+
+  {id:"machine_tuneup", cat:"equipment", title:"Soft-serve machine tune-up", note:"Recharge, seals, gaskets, calibration on the existing unit.", low:300, high:800, essential:true, on:true},
+  {id:"second_machine", cat:"equipment", title:"Second soft-serve / Greek froyo machine", note:"Dedicated froyo tap, NSF-certified.", low:4500, high:9000, essential:false, on:false},
+  {id:"standing_freezer", cat:"equipment", title:"Standing freezer/cooler", note:"Cold storage for grab-and-go pickup orders.", low:1200, high:3000, essential:false, on:false},
+  {id:"generator_service", cat:"equipment", title:"Generator service & load test", note:"Verify capacity before adding more equipment.", low:400, high:700, essential:true, on:true},
+  {id:"generator_replace", cat:"equipment", title:"Generator replacement", note:"Only if the load test shows the current unit can't handle a second machine.", low:4000, high:8000, essential:false, on:false},
+  {id:"generator_quiet", cat:"equipment", title:"Quiet generator enclosure", note:"Acoustic baffling kit to cut idle noise.", low:600, high:1500, essential:false, on:false},
+  {id:"exhaust_stack", cat:"equipment", title:"Vertical stack exhaust reroute", note:"Engine and/or generator exhaust away from the service window.", low:400, high:1000, essential:false, on:false},
+
+  {id:"interior_detail", cat:"interior", title:"Interior detail", note:"Degrease, re-seal seams, refresh flooring.", low:500, high:1500, essential:true, on:true},
+  {id:"counters_lighting", cat:"interior", title:"Modernized counters & LED lighting", note:"Resurfaced stainless, brighter service area.", low:1500, high:4000, essential:false, on:false},
+  {id:"water_tanks", cat:"interior", title:"Water tank inspection & reseal", note:"Fresh/gray water tanks for health code.", low:300, high:800, essential:true, on:true},
+  {id:"fire_suppression", cat:"interior", title:"Fire suppression system", note:"Typically required for a hot dip warmer.", low:800, high:1800, essential:true, on:true},
+
+  {id:"wrap", cat:"branding", title:"Custom vinyl graphic wrap", note:"Alternative to custom paint below.", low:3500, high:6500, essential:false, on:false},
+  {id:"paint", cat:"branding", title:"Custom paint", note:"Alternative to the wrap above.", low:5000, high:10000, essential:false, on:false},
+  {id:"signage", cat:"branding", title:"Outdoor-bright digital signage monitor", note:"Menu board visible in direct sunlight.", low:800, high:2000, essential:false, on:false},
+  {id:"pos", cat:"branding", title:"POS with thermal printer", note:"Card reader plus online ordering support.", low:600, high:1500, essential:true, on:true},
+  {id:"pa_gps", cat:"branding", title:"PA speaker refresh & GPS tracker", note:"New chime speaker and live location for an app or route page.", low:300, high:700, essential:false, on:false},
+
+  {id:"insurance", cat:"ongoing", title:"Commercial food-truck insurance", note:"Per year.", low:3000, high:6000, essential:true, on:true},
+  {id:"permits", cat:"ongoing", title:"Permits & mobile vending license", note:"Health department and municipal fees, per year.", low:500, high:1500, essential:true, on:true},
+  {id:"commissary", cat:"ongoing", title:"Commissary kitchen agreement", note:"$200\u2013500/mo, annualized.", low:2400, high:6000, essential:true, on:true},
+  {id:"fuel", cat:"ongoing", title:"Fuel & propane", note:"In-season, annualized.", low:900, high:2400, essential:true, on:true},
+  {id:"pumpout", cat:"ongoing", title:"Waste water pump-out service", note:"Per year at $40\u201380 a visit.", low:400, high:800, essential:false, on:false},
+  {id:"machine_maint", cat:"ongoing", title:"Machine maintenance, supplies & storage", note:"Contracts, cleaning supplies, seasonal storage.", low:1200, high:2500, essential:true, on:true}
+];
+
+const TRUCK_PRICE = 25000;
+const SCALE_MAX = 100000;
+const state = {cat:'all', est:'low', q:'', on:{}};
+ITEMS.forEach(it => state.on[it.id] = it.on);
+
+const fmt = n => '$' + Math.round(n).toLocaleString('en-US');
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+
+const board = document.getElementById('board');
+
+function build(){
+  CATS.forEach(cat => {
+    const items = ITEMS.filter(i => i.cat === cat.id);
+    const sec = document.createElement('section');
+    sec.className = 'cat';
+    sec.dataset.accent = cat.accent;
+    sec.dataset.cat = cat.id;
+    sec.innerHTML =
+      '<div class="cat-head">' +
+        '<h2>' + cat.title + '</h2>' +
+        '<span class="badge">' + cat.badge + '</span>' +
+        '<span class="cat-bar"><i id="bar-'+cat.id+'" style="width:0%"></i></span>' +
+        '<span class="cat-sub" id="sub-'+cat.id+'"></span>' +
+      '</div><div class="rows"></div>';
+    const rows = sec.querySelector('.rows');
+    items.forEach(it => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.dataset.id = it.id;
+      row.dataset.hay = (it.title + ' ' + it.note).toLowerCase();
+      row.setAttribute('role','checkbox');
+      row.setAttribute('tabindex','0');
+      row.innerHTML =
+        '<span class="box">'+CHECK+'</span>' +
+        '<div class="rmain"><div class="rtitle">'+it.title+(it.essential ? '<span class="ress">essential</span>' : '')+'</div>' +
+        '<div class="rnote">'+it.note+'</div></div>' +
+        '<div class="rcost">'+fmt(it.low)+'\u2013'+fmt(it.high)+'<small>'+(state.est==='low'?fmt(it.low):fmt(it.high))+' selected</small></div>';
+      const toggle = () => { state.on[it.id] = !state.on[it.id]; paint(); };
+      row.addEventListener('click', toggle);
+      row.addEventListener('keydown', e => { if(e.key===' '||e.key==='Enter'){ e.preventDefault(); toggle(); } });
+      rows.appendChild(row);
+    });
+    board.appendChild(sec);
+  });
+}
+
+function paint(){
+  let buildTotal = 0, annualTotal = 0;
+  CATS.forEach(cat => {
+    const items = ITEMS.filter(i => i.cat === cat.id);
+    let catSum = 0, catOnCount = 0;
+    items.forEach(it => {
+      const row = board.querySelector('.row[data-id="'+it.id+'"]');
+      const on = !!state.on[it.id];
+      row.classList.toggle('on', on);
+      row.setAttribute('aria-checked', String(on));
+      const val = state.est === 'low' ? it.low : it.high;
+      row.querySelector('.rcost small').textContent = fmt(val) + ' selected';
+      if(on){
+        catSum += val; catOnCount++;
+        if(cat.id === 'ongoing') annualTotal += val; else buildTotal += val;
+      }
+    });
+    const catMax = items.reduce((s,it)=>s+(state.est==='low'?it.low:it.high),0);
+    document.getElementById('bar-'+cat.id).style.width = (catMax ? catSum/catMax*100 : 0) + '%';
+    document.getElementById('sub-'+cat.id).textContent = catOnCount + ' of ' + items.length + ' selected \u00b7 ' + fmt(catSum);
+  });
+
+  const launchTotal = TRUCK_PRICE + buildTotal;
+  document.getElementById('buildTotal').textContent = fmt(buildTotal);
+  document.getElementById('launchTotal').textContent = fmt(launchTotal);
+  document.getElementById('annualTotal').textContent = fmt(annualTotal);
+  document.getElementById('pctv').textContent = fmt(launchTotal);
+  document.getElementById('cnt').innerHTML = '<b>'+fmt(TRUCK_PRICE)+'</b> truck + <b>'+fmt(buildTotal)+'</b> build<br>'+fmt(annualTotal)+'/yr to operate';
+
+  const frac = Math.min(1, launchTotal / SCALE_MAX);
+  const yB = 318, yT = 50, fy = yB - frac*(yB-yT);
+  const fr = document.getElementById('fillRect');
+  fr.setAttribute('y', fy); fr.setAttribute('height', yB-fy);
+  document.getElementById('cherry').setAttribute('opacity', frac >= 1 ? '1' : '0');
+
+  filter();
+}
+
+function filter(){
+  let shown = 0;
+  board.querySelectorAll('.row').forEach(row => {
+    const cat = row.closest('.cat').dataset.cat;
+    const okCat = state.cat === 'all' || state.cat === cat;
+    const okQ = !state.q || row.dataset.hay.includes(state.q);
+    const show = okCat && okQ;
+    row.classList.toggle('hide', !show);
+    if(show) shown++;
+  });
+  board.querySelectorAll('.cat').forEach(sec => {
+    sec.classList.toggle('hidden', !sec.querySelector('.row:not(.hide)'));
+  });
+  document.getElementById('empty').classList.toggle('hidden', shown > 0);
+}
+
+document.querySelectorAll('[data-cat]').forEach(b => b.addEventListener('click', () => {
+  state.cat = b.dataset.cat;
+  document.querySelectorAll('[data-cat]').forEach(x => x.setAttribute('aria-pressed', String(x===b)));
+  filter();
+}));
+document.querySelectorAll('[data-est]').forEach(b => b.addEventListener('click', () => {
+  state.est = b.dataset.est;
+  document.querySelectorAll('[data-est]').forEach(x => x.setAttribute('aria-pressed', String(x===b)));
+  paint();
+}));
+document.getElementById('q').addEventListener('input', e => {
+  state.q = e.target.value.trim().toLowerCase();
+  filter();
+});
+document.getElementById('essentialsOnly').addEventListener('click', () => {
+  ITEMS.forEach(it => state.on[it.id] = it.essential);
+  paint();
+});
+document.getElementById('selectAll').addEventListener('click', () => {
+  const allOn = ITEMS.every(it => state.on[it.id]);
+  ITEMS.forEach(it => state.on[it.id] = !allOn);
+  paint();
+});
+
+build(); paint();
+</script>
+</body>
+</html>
