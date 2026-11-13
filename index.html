@@ -94,7 +94,7 @@
   .gauge .sub{font-family:var(--mono);font-size:10.5px;color:var(--steel);margin-top:5px;line-height:1.5}
   .view{position:relative;min-width:0;min-height:0}
   #chart{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
-  #chart.list{cursor:crosshair}
+  #chart.drag{cursor:crosshair}
   #tableview{position:absolute;inset:0;overflow:auto;padding:0 10px 10px}
   table.grid{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px}
   table.grid th{position:sticky;top:0;background:var(--paper);font-weight:500;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--steel);text-align:right;padding:7px 8px;border-bottom:1.5px solid var(--ink);white-space:nowrap}
@@ -245,6 +245,9 @@
     <div class="sbody evbar" id="evbar">
       <span class="ttl">Events per year</span>
     </div>
+    <div class="sbody evbar" id="mornbar">
+      <span class="ttl">School-year mornings</span>
+    </div>
   </section>
 
   <section class="card" id="graph">
@@ -252,7 +255,7 @@
       <button class="iconbtn chev" type="button" data-sec="graph" aria-label="Collapse graph" aria-expanded="true"></button>
       <h2>Path to profitability</h2>
       <div class="seg" role="group" aria-label="Graph view">
-        <button type="button" data-view="list" aria-pressed="true">List size</button>
+        <button type="button" data-view="orders" aria-pressed="true">Orders / night</button>
         <button type="button" data-view="time" aria-pressed="false">Cash over time</button>
         <button type="button" data-view="money" aria-pressed="false">Money</button>
         <button type="button" data-view="table" aria-pressed="false">Table</button>
@@ -264,7 +267,7 @@
     <div class="stats">
       <div class="stat hero"><div class="k">Annual profit after truck payback</div><div class="v" id="o-year">&mdash;</div><div class="f" id="o-year-f"></div></div>
       <div class="stat"><div class="k">Per evening</div><div class="v" id="o-night">&mdash;</div><div class="f" id="o-night-f"></div></div>
-      <div class="stat"><div class="k">List needed</div><div class="v" id="o-list">&mdash;</div><div class="f" id="o-list-f"></div></div>
+      <div class="stat"><div class="k">Orders needed</div><div class="v" id="o-list">&mdash;</div><div class="f" id="o-list-f"></div></div>
       <div class="stat"><div class="k">Your hourly</div><div class="v" id="o-owner">&mdash;</div><div class="f" id="o-owner-f"></div></div>
       <div class="stat"><div class="k">Truck paid back</div><div class="v" id="o-payback">&mdash;</div><div class="f" id="o-payback-f"></div></div>
       <div class="stat"><div class="k">Total to launch</div><div class="v" id="o-launch">&mdash;</div><div class="f" id="o-launch-f"></div></div>
@@ -331,7 +334,7 @@
     <div class="sbody" id="groups"></div>
   </section>
 
-  <p class="foot">Illustrative planning model, not a forecast. Build-out, serviceware, cone and toppings figures are estimates to replace with supplier quotes. Froyo base prices come from the Nice Creams sourcing table. Event takes follow published ice cream truck catering minimums; event counts are placeholders. Profit stays in the business: the owner is not paid a wage, and the repair reserve is set aside before profit. Hidden tiles still count; paused tiles do not. realnicecreams.com</p>
+  <p class="foot">Illustrative planning model, not a forecast. Build-out, serviceware, cone and toppings figures are estimates to replace with supplier quotes. Froyo base prices come from the Nice Creams sourcing table. Walk-ups are orders with no list behind them, so the list only has to cover the rest. Morning acai bowls are pre-ordered in the app for on-site pickup during the school-year stretches. Event takes follow published ice cream truck catering minimums; event counts are placeholders. Profit stays in the business: the owner is not paid a wage, and the repair reserve is set aside before profit. Hidden tiles still count; paused tiles do not. realnicecreams.com</p>
 </div>
 
 <script>
@@ -356,7 +359,7 @@ const GROUPS=[
   {id:'reach',    title:'Reach: the list',        accent:'var(--butter)'},
   {id:'evening',  title:'Evening service',        accent:'var(--aqua)'},
   {id:'food',     title:'Food & serviceware',     accent:'var(--pine)'},
-  {id:'morning',  title:'Morning bowls',          accent:'var(--berry)'},
+  {id:'morning',  title:'Morning acai bowls',     accent:'var(--berry)'},
   {id:'events',   title:'Events',                 accent:'var(--cherry)'},
   {id:'running',  title:'Running costs',          accent:'var(--steel)'},
   {id:'truck',    title:'Truck & mechanical',     accent:'var(--butter)'},
@@ -370,7 +373,7 @@ const GROUPS=[
 const F={
   list:      {g:'reach',lab:'List size',unit:'app + sms',min:0,max:6000,step:50,def:1200,off:'base',fmt:num},
   turnout:   {g:'reach',lab:'Turnout',unit:'buy tonight',min:.005,max:.15,step:.005,def:.04,off:'base',fmt:v=>pct(v,1)},
-  walkup:    {g:'reach',lab:'Walk-ups',unit:'on top of list',min:0,max:1.5,step:.05,def:.25,off:0,fmt:v=>'+'+pct(v,0)},
+  walkOrders:{g:'reach',lab:'Walk-ups',unit:'orders / night, no list',min:0,max:100,step:1,def:12,off:0,fmt:num},
   perTicket: {g:'reach',lab:'Per order',unit:'servings',min:1,max:4,step:.1,def:1.9,off:'base',fmt:num1},
 
   price:     {g:'evening',lab:'Cone / cup price',unit:'/ serving',min:2,max:12,step:.25,def:7,off:'base',fmt:usd2},
@@ -382,16 +385,17 @@ const F={
   coneShare: {g:'food',lab:'Served in a cone',unit:'share of orders',min:0,max:100,step:5,def:30,off:0,fmt:pctw},
   toppings:  {g:'food',lab:'Toppings & extras',unit:'/ serving',min:0,max:1.5,step:.05,def:.15,off:0,fmt:usd2},
 
-  bowlPrice: {g:'morning',lab:'Bowl price',unit:'/ bowl',min:3,max:16,step:.25,def:8.5,off:'base',fmt:usd2},
-  bowlCost:  {g:'morning',lab:'Bowl cost',unit:'/ bowl',min:.5,max:7,step:.05,def:2.75,off:'base',fmt:usd2},
-  bowls:     {g:'morning',lab:'Pre-orders',unit:'/ morning',min:0,max:150,step:5,def:35,off:0,fmt:num},
-  mornWeek:  {g:'morning',lab:'Mornings',unit:'/ week',min:0,max:7,step:1,def:4,off:0,fmt:num},
-  mornWeeks: {g:'morning',lab:'Weeks',unit:'/ year',min:0,max:30,step:1,def:14,off:0,fmt:num},
+  bowlPrice: {g:'morning',lab:'Bowl price',unit:'/ acai bowl',min:3,max:16,step:.25,def:8.5,off:'base',fmt:usd2},
+  bowlCost:  {g:'morning',lab:'Bowl cost',unit:'/ acai bowl',min:.5,max:7,step:.05,def:2.75,off:'base',fmt:usd2},
+  mornFall:  {g:'morning',bar:'mornbar',lab:'Fall weeks',unit:'start of the school year',min:0,max:16,step:1,def:7,off:0,fmt:num},
+  mornSpring:{g:'morning',bar:'mornbar',lab:'Spring weeks',unit:'end of the school year',min:0,max:16,step:1,def:7,off:0,fmt:num},
+  bowls:     {g:'morning',bar:'mornbar',lab:'Pre-orders',unit:'per morning, through the app',min:0,max:150,step:5,def:35,off:0,fmt:num},
+  mornWeek:  {g:'morning',bar:'mornbar',lab:'Mornings',unit:'per week',min:0,max:7,step:1,def:4,off:0,fmt:num},
   mornHours: {g:'morning',lab:'Paid hours',unit:'/ morning',min:1,max:5,step:.5,def:3,off:'base',fmt:num1},
 
-  evCorp:    {g:'events',bar:true,lab:'Corporate',unit:'employee days, client events',min:0,max:40,step:1,def:4,off:0,fmt:num},
-  evPub:     {g:'events',bar:true,lab:'Public',unit:'festivals, markets, school nights',min:0,max:40,step:1,def:6,off:0,fmt:num},
-  evPriv:    {g:'events',bar:true,lab:'Private',unit:'parties, weddings, graduations',min:0,max:40,step:1,def:8,off:0,fmt:num},
+  evCorp:    {g:'events',bar:'evbar',lab:'Corporate',unit:'employee days, client events',min:0,max:40,step:1,def:4,off:0,fmt:num},
+  evPub:     {g:'events',bar:'evbar',lab:'Public',unit:'festivals, markets, school nights',min:0,max:40,step:1,def:6,off:0,fmt:num},
+  evPriv:    {g:'events',bar:'evbar',lab:'Private',unit:'parties, weddings, graduations',min:0,max:40,step:1,def:8,off:0,fmt:num},
   corpTake:  {g:'events',lab:'Corporate take',unit:'/ event, flat fee',min:500,max:5000,step:100,def:1600,off:'base',fmt:v=>usd(v)},
   pubTake:   {g:'events',lab:'Public take',unit:'/ event, in sales',min:300,max:5000,step:100,def:1400,off:'base',fmt:v=>usd(v)},
   privTake:  {g:'events',lab:'Private take',unit:'/ event, flat fee',min:300,max:3000,step:50,def:800,off:'base',fmt:v=>usd(v)},
@@ -491,7 +495,7 @@ function fresh(){
   Object.keys(F).forEach(k=>v[k]=F[k].def);
   ITEMS.forEach(i=>on[i.id]=i.on);
   return {name:'Base case',est:'low',v,on,ch:Object.assign({},DEFCH),sched:DEFSCHED.slice(),
-    paused:{},locked:{},hidden:{},gp:{},gh:{},gc:{fleet:true},mode:'list',
+    paused:{},locked:{},hidden:{},gp:{},gh:{},gc:{fleet:true},mode:'orders',
     ui:{scenario:true,graph:true,selectors:true,big:false}};
 }
 let S=fresh();
@@ -530,7 +534,8 @@ function unpack(o){
   if(!o||typeof o!=='object')return s;
   if(typeof o.n==='string')s.name=o.n.slice(0,40);
   if(o.e==='high')s.est='high';
-  if(['list','time','money','table'].includes(o.m))s.mode=o.m;
+  if(o.m==='list')s.mode='orders';
+  else if(['orders','time','money','table'].includes(o.m))s.mode=o.m;
   if(o.v)Object.keys(o.v).forEach(k=>{if(F[k]&&isFinite(o.v[k]))s.v[k]=snap(Number(o.v[k]),F[k]);});
   if(o.on)Object.keys(o.on).forEach(k=>{if(k in s.on)s.on[k]=!!o.on[k];});
   if(o.ch)Object.keys(o.ch).forEach(k=>{if(CHOICES[k]&&CHOICES[k].opts.some(x=>x.id===o.ch[k]))s.ch[k]=o.ch[k];});
@@ -594,10 +599,10 @@ function model(o){
   const bowlPrice=V('bowlPrice'), bowlVar=V('bowlCost')+bowlPrice*card;
   const list=o.list===undefined?V('list'):o.list;
   const vol=o.volMult===undefined?1:o.volMult;
-  const perSub=V('turnout')*(1+V('walkup'))*V('perTicket');
-  const tickets=list*V('turnout')*(1+V('walkup'))*vol;
-  const servings=list*perSub*vol;
-  const nights=V('nightsWeek')*V('eveWeeks'), mornings=V('mornWeek')*V('mornWeeks');
+  const perSub=V('turnout')*V('perTicket');   // servings a subscriber brings per night
+  const tickets=(o.orders===undefined?list*V('turnout')+V('walkOrders'):o.orders)*vol;
+  const servings=tickets*V('perTicket');
+  const nights=V('nightsWeek')*V('eveWeeks'), mornings=V('mornWeek')*(V('mornFall')+V('mornSpring'));
   const bowls=V('bowls')*(o.bowlMult===undefined?1:o.bowlMult);
   const wage=(V('wage')+(o.staffed?V('leadWage'):0))*(1+V('payrollBurden')/100);
   const prep=V('prepHours'), em=o.bowlMult===undefined?1:o.bowlMult;
@@ -630,11 +635,12 @@ function model(o){
   const margin=revenue>0?profit/revenue:0;
   const perNight=nights>0?(overhead+reserve+recovery-mornings*mornProfit-evProfit)/nights:Infinity;
   const beServings=coneContrib>0&&isFinite(perNight)?Math.max(0,Math.ceil((perNight+nightLabor+nightFuel)/coneContrib)):Infinity;
-  const beList=perSub>0&&isFinite(beServings)?Math.ceil(beServings/perSub):Infinity;
+  const beOrders=isFinite(beServings)?Math.ceil(beServings/Math.max(V('perTicket'),.01)):Infinity;
+  const beList=perSub>0&&isFinite(beServings)?Math.max(0,Math.ceil((beServings-V('walkOrders')*V('perTicket'))/perSub)):Infinity;
   return {food,sm,price,list,coneVar,coneContrib,tickets,servings,nights,mornings,
     nightRev,nightVar,nightLabor,nightFuel,nightProfit,mornRev,mornVar,mornLabor,mornFuel,mornProfit,
     evN,evRev,evVar,evLabor,evFuel,evProfit,evServ,
-    startup,recovery,overhead,reserve,revenue,variable,labor,fuel,cash,profit,ownerHours,payback,margin,beServings,beList};
+    startup,recovery,overhead,reserve,revenue,variable,labor,fuel,cash,profit,ownerHours,payback,margin,beServings,beOrders,beList};
 }
 function fleetCalc(){
   const fw=1+V('flywheel')/100, fOpen=V('openingPct')/100, fRamp=V('rampPct')/100;
@@ -744,15 +750,16 @@ function barSlider(k){
   const c=F[k], el=document.createElement('label');
   el.className='hs';
   el.innerHTML='<span>'+c.lab+'</span><output></output><input type="range" min="'+c.min+'" max="'+c.max+'" step="'+c.step+'"><small>'+c.unit+'</small>';
-  $('evbar').appendChild(el);
+  $(c.bar).appendChild(el);
   const inp=el.querySelector('input');
   BAR[k]={inp,out:el.querySelector('output')};
   inp.addEventListener('input',()=>setValue(k,Number(inp.value)));
 }
 function paintBar(m){
-  Object.keys(BAR).forEach(k=>{BAR[k].inp.value=S.v[k];BAR[k].out.textContent=F[k].fmt(S.v[k])+' / yr';});
-  $('evbar').classList.toggle('paused',gpaused('events'));
-  $('evbar').querySelector('.ttl').textContent=gpaused('events')?'Events per year (group paused)':'Events per year · '+usd(m.evRev)+' take';
+  Object.keys(BAR).forEach(k=>{BAR[k].inp.value=S.v[k];BAR[k].out.textContent=F[k].fmt(S.v[k]);});
+  const bar=(id,gid,on,off)=>{const p=gpaused(gid);$(id).classList.toggle('paused',p);$(id).querySelector('.ttl').textContent=p?off:on;};
+  bar('evbar','events','Events per year · '+usd(m.evRev)+' take','Events per year (group paused)');
+  bar('mornbar','morning','School-year mornings · '+num(m.mornings)+' mornings · '+usd(m.mornings*m.mornRev)+' in pre-orders','School-year mornings (group paused)');
 }
 function setValue(k,v){if(isLocked(k))return;S.v[k]=snap(v,F[k]);render();}
 function itemTile(it){
@@ -845,7 +852,7 @@ function paintGroups(m,fl){
     reach:num(Math.round(m.servings))+' servings / night from '+num(Math.round(m.tickets))+' orders',
     evening:num(m.nights)+' nights / year · '+usd(m.nightProfit)+' each',
     food:usd2(m.food.per)+' / serving · cup '+usd2(m.food.cup)+' · cone '+usd2(m.food.coneServ),
-    morning:m.mornings?num(m.mornings)+' mornings / year · '+usd(m.mornProfit)+' each':'no morning service',
+    morning:m.mornings?num(m.mornings)+' school-year mornings · '+usd(m.mornProfit)+' each, pre-ordered for pickup':'no morning service',
     events:m.evN?num(m.evN)+' events / year · '+usd(m.evRev)+' take · '+usd(m.evProfit)+' after costs':'no events',
     running:usd(m.reserve)+' repair reserve · '+usd(m.overhead)+' / year overhead · '+usd(m.labor)+' wages · '+usd(m.fuel)+' fuel',
     fleet:fl.total+' trucks by year 5 · '+big(fl.years[4].rev)+' revenue'
@@ -881,8 +888,8 @@ function paintStats(m){
   $('o-year-f').textContent=usd(m.revenue)+' in · '+usd(m.revenue-m.profit)+' out · '+pct(m.margin,0);
   set('o-night',usd(m.nightProfit),m.nightProfit>=0?'pos':'neg');
   $('o-night-f').textContent=num(Math.round(m.servings))+' servings · '+num(Math.round(m.tickets))+' orders';
-  set('o-list',isFinite(m.beList)?num(m.beList):'—');
-  $('o-list-f').textContent=isFinite(m.beServings)?num(m.beServings)+' servings / night':'price is below its cost';
+  set('o-list',isFinite(m.beOrders)?num(m.beOrders):'—');
+  $('o-list-f').textContent=isFinite(m.beOrders)?num(m.beServings)+' servings · '+(m.beList>0?num(m.beList)+' on the list':'walk-ups alone'):'price is below its cost';
   set('o-owner',m.ownerHours>0?usd(m.profit/m.ownerHours):'—',m.profit>=0?'pos':'neg');
   $('o-owner-f').textContent=num(Math.round(m.ownerHours))+' of your hours / year';
   set('o-payback',isFinite(m.payback)?nf(m.payback,1)+' yr':'never',isFinite(m.payback)?'pos':'neg');
@@ -952,7 +959,7 @@ function paintScenario(m,hiddenCount){
   $('bigBtn').textContent=S.ui.big?'Shrink graph':'Expand graph';
   $('bigBtn').setAttribute('aria-pressed',String(S.ui.big));
   $('viewnote').textContent=
-    S.mode==='list'?'Drag across the chart to size the subscriber list'
+    S.mode==='orders'?'Drag across the chart to set orders a night; the list moves to match'
     :S.mode==='time'?'Cumulative cash from launch, averaged evenly across the year'
     :S.mode==='money'?'Where a year of revenue ends up'
     :'Per-shift and annual profit and loss';
@@ -979,32 +986,39 @@ function grid(lo,span){
   }
   return g;
 }
-function listMax(m){return Math.max(1000,Math.ceil((Math.max(S.v.list,V('list'),isFinite(m.beList)?m.beList:0)*2)/250)*250);}
-function drawList(m){
-  const xMax=listMax(m), p0=model({list:0}), p1=model({list:xMax});
+function ordersToList(o){const t=V('turnout');return t>0?Math.max(0,(o-V('walkOrders'))/t):0;}
+function orderMax(m){return Math.max(40,Math.ceil(Math.max(m.tickets,isFinite(m.beOrders)?m.beOrders:0)*2/10)*10);}
+function drawOrders(m){
+  const xMax=orderMax(m), p0=model({orders:0}), p1=model({orders:xMax});
   const lo=Math.min(p0.profit,0), hi=Math.max(p1.profit,0,p1.cash), span=(hi-lo)||1;
   const X=v=>PAD.l+(v/xMax)*(CW-PAD.l-PAD.r), Y=v=>CH_-PAD.b-((v-lo)/span)*(CH_-PAD.t-PAD.b);
   let g=grid(lo,span);
   for(let i=0;i<4;i++){const v=xMax*i/4;g+='<text x="'+X(v)+'" y="'+(CH_-10)+'" text-anchor="middle" font-family="'+MONO+'" font-size="10" fill="var(--steel)">'+Math.round(v).toLocaleString()+'</text>';}
-  g+='<text x="'+(CW-PAD.r)+'" y="'+(CH_-10)+'" text-anchor="end" font-family="'+MONO+'" font-size="9" fill="var(--steel)" letter-spacing="1">SUBSCRIBERS ON THE LIST</text>';
-  const y0=Y(0), bx=isFinite(m.beList)?Math.min(m.beList,xMax):xMax, pb=model({list:bx}).profit;
+  g+='<text x="'+(CW-PAD.r)+'" y="'+(CH_-10)+'" text-anchor="end" font-family="'+MONO+'" font-size="9" fill="var(--steel)" letter-spacing="1">ORDERS PER NIGHT</text>';
+  const y0=Y(0), bx=isFinite(m.beOrders)?Math.min(m.beOrders,xMax):xMax, pb=model({orders:bx}).profit;
   g+='<polygon points="'+X(0)+','+Y(p0.profit)+' '+X(bx)+','+Y(pb)+' '+X(bx)+','+y0+' '+X(0)+','+y0+'" fill="var(--cherry)" opacity=".09"/>';
-  if(isFinite(m.beList)&&m.beList<xMax)g+='<polygon points="'+X(bx)+','+y0+' '+X(xMax)+','+Y(p1.profit)+' '+X(xMax)+','+y0+'" fill="var(--aqua)" opacity=".14"/>';
+  if(isFinite(m.beOrders)&&m.beOrders<xMax)g+='<polygon points="'+X(bx)+','+y0+' '+X(xMax)+','+Y(p1.profit)+' '+X(xMax)+','+y0+'" fill="var(--aqua)" opacity=".14"/>';
   g+='<line x1="'+PAD.l+'" y1="'+y0+'" x2="'+(CW-PAD.r)+'" y2="'+y0+'" stroke="var(--ink)" stroke-width="1.3"/>';
   g+='<line x1="'+X(0)+'" y1="'+Y(p0.cash)+'" x2="'+X(xMax)+'" y2="'+Y(p1.cash)+'" stroke="var(--steel)" stroke-width="1.6" stroke-dasharray="3 4"/>';
   g+='<line x1="'+X(0)+'" y1="'+Y(p0.profit)+'" x2="'+X(xMax)+'" y2="'+Y(p1.profit)+'" stroke="var(--aqua)" stroke-width="2.6"/>';
-  if(isFinite(m.beList)&&m.beList<=xMax){
-    const x=X(m.beList);
+  if(V('walkOrders')>0&&V('walkOrders')<xMax){
+    const wx=X(V('walkOrders'));
+    g+='<line x1="'+wx+'" y1="'+(CH_-PAD.b)+'" x2="'+wx+'" y2="'+(CH_-PAD.b-14)+'" stroke="var(--butter)" stroke-width="2"/>';
+    g+='<text x="'+(wx+5)+'" y="'+(CH_-PAD.b-5)+'" font-family="'+MONO+'" font-size="9.5" fill="var(--butter)">'+num(V('walkOrders'))+' walk-ups, no list</text>';
+  }
+  if(isFinite(m.beOrders)&&m.beOrders<=xMax){
+    const x=X(m.beOrders);
     g+='<line x1="'+x+'" y1="'+PAD.t+'" x2="'+x+'" y2="'+(CH_-PAD.b)+'" stroke="var(--cherry)" stroke-width="1.2" stroke-dasharray="3 3"/>';
     g+='<circle cx="'+x+'" cy="'+y0+'" r="5" fill="var(--paper)" stroke="var(--cherry)" stroke-width="2.4"/>';
-    g+='<text x="'+(x+8)+'" y="'+(y0-9)+'" font-family="'+MONO+'" font-size="10.5" fill="var(--cherry)">breaks even at '+m.beList.toLocaleString()+'</text>';
+    g+='<text x="'+(x+8)+'" y="'+(y0-9)+'" font-family="'+MONO+'" font-size="10.5" fill="var(--cherry)">breaks even at '+num(m.beOrders)+' orders</text>';
   }
-  const cx=X(Math.min(m.list,xMax));
+  const cx=X(Math.min(m.tickets,xMax));
   g+='<line x1="'+cx+'" y1="'+PAD.t+'" x2="'+cx+'" y2="'+(CH_-PAD.b)+'" stroke="var(--ink)" stroke-width="1.4" opacity=".5"/>';
   g+='<circle cx="'+cx+'" cy="'+Y(m.profit)+'" r="5" fill="var(--aqua)" stroke="var(--paper)" stroke-width="2"/>';
-  const lx=Math.min(cx+7,CW-PAD.r-104);
-  g+='<rect x="'+lx+'" y="'+PAD.t+'" width="102" height="20" rx="6" fill="var(--ink)"/>';
-  g+='<text x="'+(lx+51)+'" y="'+(PAD.t+14)+'" text-anchor="middle" font-family="'+MONO+'" font-size="10.5" fill="#fff">'+Math.round(m.list).toLocaleString()+' on list</text>';
+  const lbl=num(Math.round(m.tickets))+' orders · '+num(Math.round(m.list))+' on list';
+  const wpx=Math.max(104,lbl.length*6.6), lx=Math.min(cx+7,CW-PAD.r-wpx);
+  g+='<rect x="'+lx+'" y="'+PAD.t+'" width="'+wpx+'" height="20" rx="6" fill="var(--ink)"/>';
+  g+='<text x="'+(lx+wpx/2)+'" y="'+(PAD.t+14)+'" text-anchor="middle" font-family="'+MONO+'" font-size="10.5" fill="#fff">'+lbl+'</text>';
   g+='<text x="'+PAD.l+'" y="'+(PAD.t+11)+'" font-family="'+MONO+'" font-size="9.5" fill="var(--steel)">solid: after truck payback · dashed: cash</text>';
   return g;
 }
@@ -1036,7 +1050,7 @@ function drawTime(m){
 function drawMoney(m){
   const bars=[
     {l:'Evening cones',v:m.nights*m.nightRev,c:'var(--aqua)'},
-    {l:'Morning bowls',v:m.mornings*m.mornRev,c:'var(--berry)'},
+    {l:'Acai bowls',v:m.mornings*m.mornRev,c:'var(--berry)'},
     {l:'Events',v:m.evRev,c:'var(--cherry)'},
     {l:'Product cost',v:-m.variable,c:'var(--butter)'},
     {l:'Helper wages',v:-m.labor,c:'var(--steel)'},
@@ -1063,20 +1077,20 @@ function drawMoney(m){
 function drawChart(m){
   const table=S.mode==='table';
   chart.classList.toggle('hidden',table);
-  chart.classList.toggle('list',S.mode==='list');
+  chart.classList.toggle('drag',S.mode==='orders');
   $('tableview').classList.toggle('hidden',!table);
   if(table||!S.ui.graph)return;
   chart.setAttribute('viewBox','0 0 '+CW+' '+CH_);
-  chart.innerHTML=S.mode==='money'?drawMoney(m):S.mode==='time'?drawTime(m):drawList(m);
+  chart.innerHTML=S.mode==='money'?drawMoney(m):S.mode==='time'?drawTime(m):drawOrders(m);
 }
 let dragChart=false;
 function chartSet(e){
-  if(S.mode!=='list'||isLocked('list'))return;
+  if(S.mode!=='orders'||isLocked('list'))return;
   const r=chart.getBoundingClientRect();
   const frac=(((e.clientX-r.left)/r.width)*CW-PAD.l)/(CW-PAD.l-PAD.r);
-  setValue('list',Math.max(0,Math.min(1,frac))*listMax(model()));
+  setValue('list',ordersToList(Math.max(0,Math.min(1,frac))*orderMax(model())));
 }
-chart.addEventListener('pointerdown',e=>{if(S.mode!=='list')return;dragChart=true;try{chart.setPointerCapture(e.pointerId);}catch(_){}chartSet(e);});
+chart.addEventListener('pointerdown',e=>{if(S.mode!=='orders')return;dragChart=true;try{chart.setPointerCapture(e.pointerId);}catch(_){}chartSet(e);});
 chart.addEventListener('pointermove',e=>{if(dragChart)chartSet(e);});
 chart.addEventListener('pointerup',()=>{dragChart=false;});
 chart.addEventListener('pointercancel',()=>{dragChart=false;});
