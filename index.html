@@ -903,7 +903,7 @@ function paintStats(m){
   const span=isFinite(m.beServings)&&m.beServings>0?m.beServings*2:Math.max(m.servings,1)*2;
   const p=Math.max(0,Math.min(1,m.servings/(span||1))), fy=yB-p*(yB-yT);
   $('fillRect').setAttribute('y',fy);$('fillRect').setAttribute('height',yB-fy);
-  $('beLabel').textContent=isFinite(m.beServings)?'break-even '+m.beServings:'no break-even';
+  $('beLabel').textContent=isFinite(m.beServings)?'break-even '+m.beServings+' servings':'no break-even';
   $('cherry').setAttribute('opacity',m.profit>0?'1':'0');
   $('volReadout').textContent=num(Math.round(m.servings));
   $('volSub').innerHTML='servings / night<br>'+(isFinite(m.beServings)
